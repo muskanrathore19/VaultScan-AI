@@ -1,0 +1,414 @@
+{
+  "signatures": [
+    {
+      "name": "OpenAI API Key (Legacy)",
+      "pattern": "\\bsk-[a-zA-Z0-9]{48}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "OpenAI API Key (Project)",
+      "pattern": "\\bsk-proj-[a-zA-Z0-9\\-_]{48,}\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "Anthropic API Key",
+      "pattern": "\\bsk-ant-api03-[a-zA-Z0-9\\-_]{60,100}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Google API/GCP Key",
+      "pattern": "\\bAIza[0-9A-Za-z\\-_]{35}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "OpenRouter API Key",
+      "pattern": "\\bsk-or-v1-[a-zA-Z0-9]{64}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "xAI (Grok) API Key",
+      "pattern": "\\bxai-[a-zA-Z0-9\\-_]{60,100}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Groq API Key",
+      "pattern": "\\bgsk_[a-zA-Z0-9]{32,64}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "HuggingFace Token",
+      "pattern": "\\bhf_[a-zA-Z]{34}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Replicate Token",
+      "pattern": "\\br8_[a-zA-Z0-9]{37}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Cerebras Token",
+      "pattern": "\\bcs-[a-zA-Z0-9]{32,64}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "AWS Access Key ID",
+      "pattern": "\\bAKIA[0-9A-Z]{16}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "AWS Session Token",
+      "pattern": "\\bASIA[0-9A-Z]{16}\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "DigitalOcean PAT",
+      "pattern": "\\bdop_v1_[a-f0-9]{64}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Heroku API Key",
+      "pattern": "\\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\\b",
+      "risk": "High",
+      "tags": [
+        "heroku"
+      ]
+    },
+    {
+      "name": "Mapbox API Key",
+      "pattern": "\\b(?:pk|sk)\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Sentry Token",
+      "pattern": "\\bsntrys_[a-zA-Z0-9_-]{64,}\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "Databricks PAT",
+      "pattern": "\\bdapi[a-h0-9]{32}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "GitHub Classic PAT",
+      "pattern": "\\b(?:ghp|gho|ghu|ghs|ghr)_[a-zA-Z0-9]{36}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "GitHub Fine-Grained PAT",
+      "pattern": "\\bgithub_pat_[a-zA-Z0-9]{22}_[a-zA-Z0-9]{59}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "GitLab PAT",
+      "pattern": "\\bglpat-[a-zA-Z0-9\\-]{20}\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "NPM Access Token",
+      "pattern": "\\b(?:npm_[a-zA-Z0-9]{36})\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "PyPI Upload Token",
+      "pattern": "\\bpypi-AgEIcHlwaS5vcmc[A-Za-z0-9\\-_]{50,150}\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "Postman API Key",
+      "pattern": "\\bPMAK-[a-f0-9]{24}-[a-f0-9]{34}\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "Discord Bot Token",
+      "pattern": "\\b[MNO][a-zA-Z0-9_-]{23,27}\\.[a-zA-Z0-9_-]{6}\\.[a-zA-Z0-9_-]{27,38}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Discord Webhook",
+      "pattern": "https://discord\\.com/api/webhooks/[0-9]{17,19}/[a-zA-Z0-9_-]{60,68}",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Slack Bot Token",
+      "pattern": "\\bxoxb-[0-9]{10,13}-[0-9]{10,13}-[a-zA-Z0-9]{24}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Slack User Token",
+      "pattern": "\\bxox[pausr]-[0-9]{10,13}-[a-zA-Z0-9]{24,32}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Slack Webhook",
+      "pattern": "https://hooks\\.slack\\.com/services/T[a-zA-Z0-9_]{8,10}/B[a-zA-Z0-9_]{8,10}/[a-zA-Z0-9_]{24}",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Telegram Bot Token",
+      "pattern": "\\b[0-9]{8,10}:[a-zA-Z0-9_-]{35}\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "Twilio API Key",
+      "pattern": "\\bSK[0-9a-fA-F]{32}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "SendGrid API Key",
+      "pattern": "\\bSG\\.[a-zA-Z0-9_\\-\\.]{66}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Mailgun API Key",
+      "pattern": "\\bkey-[0-9a-zA-Z]{32}\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "Stripe Secret Key",
+      "pattern": "\\b(?:sk|rk)_(?:test|live)_[0-9a-zA-Z]{24,99}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Square Access Token",
+      "pattern": "\\bsq0atp-[0-9A-Za-z\\-_]{22,43}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Square OAuth Secret",
+      "pattern": "\\bsq0csp-[0-9A-Za-z\\-_]{43}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Shopify Access Token",
+      "pattern": "\\bshpat_[a-fA-F0-9]{32}\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "Shopify Custom App",
+      "pattern": "\\bshpca_[a-fA-F0-9]{32}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Supabase PAT",
+      "pattern": "\\bsbp_[a-zA-Z0-9]{40}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Supabase Anon/Service Role JWT",
+      "pattern": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Firebase Server Key",
+      "pattern": "\\bAAAA[A-Za-z0-9_-]{7}:[A-Za-z0-9_-]{140}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Firebase Database URL",
+      "pattern": "https:\\/\\/[a-z0-9-]+\\.firebaseio\\.com",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "PlanetScale Password",
+      "pattern": "\\bpscale_pw_[a-zA-Z0-9_\\.\\-]{43}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "PlanetScale OAuth Token",
+      "pattern": "\\bpscale_oauth_[a-zA-Z0-9_\\.\\-]{32,64}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Airtable PAT",
+      "pattern": "\\bpat[a-zA-Z0-9]{14}\\.[a-zA-Z0-9]{64}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Appwrite API Key",
+      "pattern": "(?i)appwrite[\\w\\s=-]{0,20}(?:key|token|secret)[\\w\\s=:\\\"\\'-]{0,10}\\b([a-zA-Z0-9\\-_]{32,})\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Deta Token",
+      "pattern": "(?i)deta[\\w\\s=-]{0,20}(?:key|token)[\\w\\s=:\\\"\\'-]{0,10}\\b([a-zA-Z0-9_]{32,})\\b",
+      "risk": "Low",
+      "tags": []
+    },
+    {
+      "name": "PocketBase Token",
+      "pattern": "(?i)pocketbase[\\w\\s=-]{0,20}(?:key|token|admin)[\\w\\s=:\\\"\\'-]{0,10}\\b([a-zA-Z0-9\\-_]{32,})\\b",
+      "risk": "Low",
+      "tags": []
+    },
+    {
+      "name": "AWS Secret Access Key (Env Var)",
+      "pattern": "(?i)aws_secret_access_key\\s*[:=]\\s*['\\\"]?([A-Za-z0-9/+=]{40})['\\\"]?",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Stripe Webhook Secret",
+      "pattern": "\\bwhsec_[a-zA-Z0-9]{32,}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Slack App Token",
+      "pattern": "\\bxapp-[A-Za-z0-9-]{20,}\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Google OAuth Client Secret",
+      "pattern": "\\bGOCSPX-[A-Za-z0-9_-]{20,}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Google OAuth Access Token",
+      "pattern": "\\bya29\\.[A-Za-z0-9_-]{20,}\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Twilio Auth Token (Context)",
+      "pattern": "(?i)twilio[\\w\\s=-]{0,20}(?:auth|token)[\\w\\s=:\\\"\\'-]{0,10}\\b([0-9a-f]{32})\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Azure Storage Connection String",
+      "pattern": "DefaultEndpointsProtocol=https?;AccountName=[^;]+;AccountKey=[A-Za-z0-9+/=]{40,};EndpointSuffix=core\\.windows\\.net",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "MongoDB Connection URI",
+      "pattern": "mongodb(?:\\+srv)?:\\/\\/[^\\s:@/]+:[^\\s@/]+@[^\\s/]+",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "PostgreSQL Connection URI",
+      "pattern": "(?:postgres|postgresql):\\/\\/[^\\s:@/]+:[^\\s@/]+@[^\\s/]+",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "MySQL/MariaDB Connection URI",
+      "pattern": "(?:mysql|mariadb):\\/\\/[^\\s:@/]+:[^\\s@/]+@[^\\s/]+",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "Redis Connection URI (Password)",
+      "pattern": "redis(?:\\+ssl)?:\\/\\/:?[^\\s@/]+@[^\\s/]+",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "RabbitMQ/AMQP URI",
+      "pattern": "amqps?:\\/\\/[^\\s:@/]+:[^\\s@/]+@[^\\s/]+",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Mailchimp API Key (Context)",
+      "pattern": "(?i)mailchimp[\\w\\s=-]{0,20}(?:key|token|api)[\\w\\s=:\\\"\\'-]{0,10}\\b([0-9a-f]{32}-us\\d{1,2})\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "Datadog API Key (Context)",
+      "pattern": "(?i)datadog[\\w\\s=-]{0,20}(?:api|app)?[\\w\\s=-]{0,10}(?:key|token)[\\w\\s=:\\\"\\'-]{0,10}\\b([a-f0-9]{32})\\b",
+      "risk": "Medium",
+      "tags": []
+    },
+    {
+      "name": "Algolia Admin API Key (Context)",
+      "pattern": "(?i)algolia[\\w\\s=-]{0,20}(?:admin|key|token)[\\w\\s=:\\\"\\'-]{0,10}\\b([A-Za-z0-9]{32})\\b",
+      "risk": "High",
+      "tags": []
+    },
+    {
+      "name": "Cloudinary API Secret (Context)",
+      "pattern": "(?i)cloudinary[\\w\\s=-]{0,20}(?:api_secret|secret)[\\w\\s=:\\\"\\'-]{0,10}\\b([A-Za-z0-9]{32})\\b",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Private Key (PKCS8)",
+      "pattern": "-----BEGIN PRIVATE KEY-----",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Private Key (RSA)",
+      "pattern": "-----BEGIN RSA PRIVATE KEY-----",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Private Key (EC)",
+      "pattern": "-----BEGIN EC PRIVATE KEY-----",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "Private Key (OPENSSH)",
+      "pattern": "-----BEGIN OPENSSH PRIVATE KEY-----",
+      "risk": "Critical",
+      "tags": []
+    },
+    {
+      "name": "PGP Private Key Block",
+      "pattern": "-----BEGIN PGP PRIVATE KEY BLOCK-----",
+      "risk": "Critical",
+      "tags": []
+    }
+  ]
+}
