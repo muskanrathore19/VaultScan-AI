@@ -190,7 +190,7 @@ const Discovery = () => {
 
 
   return (
-    <div className="flex h-screen bg-[#0B0F1A] text-slate-300 overflow-hidden">
+    <div className="flex h-screen bg-[#0B0F1A] text-slate-300 overflow-hidden custom-scrollbar">
       <Sidebar />
 
       <div className="flex-1 flex flex-col">

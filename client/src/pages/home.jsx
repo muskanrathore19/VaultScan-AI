@@ -94,7 +94,7 @@ const Home = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#0B0F1A] text-slate-300 overflow-hidden">
+    <div className="flex h-screen bg-[#0B0F1A] text-slate-300 overflow-hidden custom-scrollbar">
       {showAiModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-black rounded-lg shadow-lg w-[90%] max-w-5xl max-h-[90vh] overflow-y-auto">
