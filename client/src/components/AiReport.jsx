@@ -113,9 +113,9 @@ const S = {
   badge: (sev) => {
     const map = {
       critical: { bg: "#fef2f2", color: "#7f1d1d", border: "#fca5a5" },
-      high:     { bg: "#fef2f2", color: "#7f1d1d", border: "#fca5a5" },
-      medium:   { bg: "#fffbeb", color: "#78350f", border: "#fcd34d" },
-      low:      { bg: "#f0fdf4", color: "#14532d", border: "#86efac" },
+      high: { bg: "#fef2f2", color: "#7f1d1d", border: "#fca5a5" },
+      medium: { bg: "#fffbeb", color: "#78350f", border: "#fcd34d" },
+      low: { bg: "#f0fdf4", color: "#14532d", border: "#86efac" },
       informational: { bg: "#eff6ff", color: "#1e3a8a", border: "#93c5fd" },
     };
     const t = map[sev?.toLowerCase()] || { bg: "#f3f4f6", color: "#374151", border: "#d1d5db" };
@@ -177,7 +177,7 @@ const S = {
     borderBottom: "1px solid #f3f4f6",
     animation: "police-flash 2s infinite steps(1)"
   },
-  
+
   prose: {
     fontSize: 14,
     lineHeight: 1.8,
@@ -254,12 +254,12 @@ export default function AiReport({ data, sevr }) {
     const md = data;
     const owaspSection = extractSection(md, "(?:OWASP|CWE|Mappings)") || md;
     return {
-      executive:       extractExecutiveSummary(md),
-      severity:        sevr,
-      issues:          extractSection(md, "Detect Security Issues"),
+      executive: extractExecutiveSummary(md),
+      severity: sevr,
+      issues: extractSection(md, "Detect Security Issues"),
       vulnerabilities: extractSection(md, "Explain Possible Vulnerabilities"),
-      remediation:     extractSection(md, "Suggest Remediation"),
-      mappings:        extractMappings(owaspSection),
+      remediation: extractSection(md, "Suggest Remediation"),
+      mappings: extractMappings(owaspSection),
     };
   }, [data, sevr]);
 
@@ -268,9 +268,9 @@ export default function AiReport({ data, sevr }) {
   }
 
   const sections = [
-    { icon: "🛡️", title: "Security Issues Detected",  raw: parsed.issues },
-    { icon: "🐛", title: "Possible Vulnerabilities",   raw: parsed.vulnerabilities },
-    { icon: "🔧", title: "Remediation Steps",          raw: parsed.remediation },
+    { icon: "🛡️", title: "Security Issues Detected", raw: parsed.issues },
+    { icon: "🐛", title: "Possible Vulnerabilities", raw: parsed.vulnerabilities },
+    { icon: "🔧", title: "Remediation Steps", raw: parsed.remediation },
   ];
 
   return (
@@ -299,7 +299,7 @@ export default function AiReport({ data, sevr }) {
         const items = parseBodyItems(raw);
         if (!items.length) return null;
         const bullets = items.filter((i) => i.type === "bullet");
-        const prose   = items.filter((i) => i.type === "prose");
+        const prose = items.filter((i) => i.type === "prose");
         return (
           <div key={title} style={S.sectionWrap}>
             <div style={S.sectionHead}>

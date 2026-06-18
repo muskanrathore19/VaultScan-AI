@@ -92,6 +92,12 @@ const Home = () => {
       setLoading(false);
     }
   };
+  const getBarColor = (title) => {
+  if (title.includes("Critical")) return "bg-purple-500";
+  if (title.includes("High")) return "bg-orange-500";
+  if (title.includes("Medium")) return "bg-yellow-500";
+  return "bg-green-500";
+};
 
   return (
     <div className="flex h-screen bg-[#0B0F1A] text-slate-300 overflow-hidden custom-scrollbar">
@@ -133,7 +139,7 @@ const Home = () => {
         <main className="p-6 space-y-6 overflow-y-auto">
 
           {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((stat) => (
               <Card key={stat.title}>
                 <div className="flex justify-between mb-2">
@@ -146,7 +152,40 @@ const Home = () => {
                 <h2 className={`text-3xl font-bold ${stat.color}`}>{stat.count}</h2>
               </Card>
             ))}
-          </div>
+          </div> */}
+          {/* Stats */}
+
+
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  {stats.map((stat) => (
+    <Card key={stat.title}>
+      <div className="flex justify-between mb-2">
+        <span className="text-gray-400 text-sm">
+          {stat.title}
+        </span>
+
+        <span className="text-xs flex items-center gap-1">
+          {stat.isUp ? (
+            <ArrowUpRight size={12} />
+          ) : (
+            <ArrowDownRight size={12} />
+          )}
+          {stat.change}
+        </span>
+      </div>
+
+      <h2 className={`text-3xl font-bold ${stat.color}`}>
+        {stat.count}
+      </h2>
+
+      <div
+        className={`mt-3 h-1 w-12 rounded-full shadow-lg ${getBarColor(
+          stat.title
+        )}`}
+      />
+    </Card>
+  ))}
+</div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
@@ -170,7 +209,7 @@ const Home = () => {
                   <div key={item.id} className="flex justify-between p-2 bg-white/5 rounded">
                     <div>
                       <div className="text-sm">{item.title}</div>
-                      <div className="text-xs text-gray-400">{item.subtitle}</div>
+                      <div className="text-xs text-gray-400">{item.subtitle?.replace(/^https:\/\/github\.com\//, "")}</div>
                     </div>
                     <Badge type={item.risk}>{item.risk}</Badge>
                   </div>
@@ -185,7 +224,7 @@ const Home = () => {
                   <div key={item.id} className="flex justify-between p-2 bg-white/5 rounded">
                     <div>
                       <div className="text-sm">{item.repo}</div>
-                      <div className="text-xs text-gray-400">{item.createdAt}</div>
+                      <div className="text-xs text-gray-400">{new Date(item.createdAt).toLocaleDateString()}</div>
                     </div>
                     <Badge type={item.risk}>{item.risk}</Badge>
                   </div>

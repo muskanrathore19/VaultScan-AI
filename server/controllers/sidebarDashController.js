@@ -1,5 +1,4 @@
 import Scan from "../models/Scan.js";
-import CleanRecord from "../models/CleanRecord.js";
 import { formatDistanceToNowStrict } from "date-fns";
 
 export const getAnalytics = async (req, res) => {
@@ -13,11 +12,7 @@ export const getAnalytics = async (req, res) => {
       .sort({ createdAt: -1 })
       .select("totalFindings createdAt");
 
-    const clean = await CleanRecord.find({
-      user: userId
-    })
-
-    console.log(clean.length)
+    console.log(scans)
 
     const totalScans = scans.length;
 
@@ -59,7 +54,7 @@ export const getAnalytics = async (req, res) => {
         : 0;
 
     const risk = Math.min(
-      Math.round(avgFindings * 5),
+      Math.round((avgFindings * 5)/8),
       100
     );
 

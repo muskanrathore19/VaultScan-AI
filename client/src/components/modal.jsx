@@ -57,9 +57,9 @@ const RepoFindingsModal = ({ repoData, loading, onClose, repoName }) => {
                       <td className="p-2">{f.secretType}</td>
 
                       <td className={`p-2 font-medium ${f.risk === "Critical" ? "text-red-500" :
-                          f.risk === "High" ? "text-orange-400" :
-                            f.risk === "Medium" ? "text-yellow-400" :
-                              "text-green-400"
+                        f.risk === "High" ? "text-orange-400" :
+                          f.risk === "Medium" ? "text-yellow-400" :
+                            "text-green-400"
                         }`}>
                         {f.risk}
                       </td>

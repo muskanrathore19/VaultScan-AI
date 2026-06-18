@@ -23,23 +23,23 @@ const SECURITY_TIPS = [
 ];
 
 const TopHeader = ({ name }) => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleLogout = () => {
-        // Remove JWT token
-        localStorage.removeItem("token");
+  const handleLogout = () => {
+    // Remove JWT token
+    localStorage.removeItem("token");
 
-        // Optional: remove user data if stored
-        localStorage.removeItem("user");
+    // Optional: remove user data if stored
+    localStorage.removeItem("user");
 
-        // Redirect to login page
-        navigate("/login");
-    };
+    // Redirect to login page
+    navigate("/login");
+  };
 
-    const [tipIndex, setTipIndex] = useState(0);
-    const [visible, setVisible] = useState(true);
+  const [tipIndex, setTipIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
 
- useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setVisible(false);
 
@@ -53,53 +53,52 @@ const TopHeader = ({ name }) => {
   }, []);
 
 
-    return (
-        <header className="flex items-center justify-between py-4 px-6 border-b border-white/10 bg-[#0B0F1A]/50 backdrop-blur-xl">
-            <div className="relative w-full max-w-md">
-                {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+  return (
+    <header className="flex items-center justify-between py-4 px-6 border-b border-white/10 bg-[#0B0F1A]/50 backdrop-blur-xl">
+      <div className="relative w-full max-w-md">
+        {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                 <input
                     type="text"
                     placeholder="Search vulnerabilities..."
                     className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white"
                 /> */}
-                <div className="w-full max-w-md">
-  <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
-    <div className="flex items-center gap-2">
-      <span className="text-purple-400">💡Tip: </span>
+        <div className="w-full max-w-md">
+          <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+            <div className="flex items-center gap-2">
+              <span className="text-purple-400">💡Tip: </span>
 
-      <div>
+              <div>
 
-        <p
-              className={`text-sm text-purple-400 transition-all duration-300 ease-in-out ${
-                visible
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 -translate-y-2"
-              }`}
-            >
-              {SECURITY_TIPS[tipIndex]}
-            </p>
+                <p
+                  className={`text-sm text-purple-400 transition-all duration-300 ease-in-out ${visible
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 -translate-y-2"
+                    }`}
+                >
+                  {SECURITY_TIPS[tipIndex]}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-            </div>
 
-            <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                    <User className="w-6 h-6 text-white" />
-                    <span>{name}</span>
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <User className="w-6 h-6 text-white" />
+          <span>{name}</span>
 
-                    <Lock className="w-5 h-5 text-white ml-4" />
-                    <button 
-                        onClick={handleLogout}
-                        className="text-sm text-red-400 hover:text-red-500"
-                    >
-                        Logout
-                    </button>
-                </div>
-            </div>
-        </header>
-    );
+          <Lock className="w-5 h-5 text-white ml-4" />
+          <button
+            onClick={handleLogout}
+            className="text-sm text-red-400 hover:text-red-500"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+  );
 };
 
 export default TopHeader;
