@@ -11,19 +11,39 @@ export const runScan = async (req, res) => {
       return res.status(400).json({ error: "repoUrl required" });
     }
 
+    try {
+      const result = await scanRepoService(repoUrl);
+    } catch (error) {
+      const status = error.response?.status;
 
-    const result = await scanRepoService(repoUrl);
+      if (status === 404) {
+         return res.status(404).json({error:"Repository not found. Please check the repository URL."})
+        };
+
+      if (status === 401 || status === 403) {
+        throw {
+          status: status,
+          message: "GitHub PAT token is invalid, expired, lacks permissions, or API rate limit has been reached."
+        };
+      }
+
+      throw {
+        status: 500,
+        message: error.message || "Repository scan failed."
+      };
+    }
+
 
     const { findings, repo, duration, aiReview } = result;
 
     if (findings.length === 0) {
       try {
         await CleanRecord.create({
-          user: req.user.id,        
-          repo: repo,   
-          risk: "Clean",            
+          user: req.user.id,
+          repo: repo,
+          risk: "Clean",
           scannedAt: new Date(),
-          AI: aiReview  
+          AI: aiReview
         });
 
         console.log("Clean record saved");
@@ -46,7 +66,7 @@ export const runScan = async (req, res) => {
       totalFindings: findings.length,
       duration,
       status: "completed",
-      aiReview 
+      aiReview
 
     });
 

@@ -93,13 +93,13 @@ const Discovery = () => {
       const res = await api.get("/last-scan", {
         withCredentials: true,
       });
-      
+
       const normalized = normalizeScanResponse(res.data);
       setScanData(normalized);
 
       if (normalized.id) {
         fetchAiReview(normalized.id);
-      } 
+      }
     } catch (err) {
       console.error("Last scan error:", err);
       setScanData({ type: "none", data: [] });
@@ -135,6 +135,15 @@ const Discovery = () => {
   };
 
   const handleScan = async () => {
+    const result = normalizeGithubRepoUrl(repoUrl);
+
+    if (!result.valid) {
+      // toast.error(result.error);
+      return;
+    }
+
+    // Update input with cleaned URL
+    setRepoUrl(result.url);
     if (!repoUrl) return;
 
     try {
@@ -143,7 +152,7 @@ const Discovery = () => {
       stopPolling(); // stop any previous poll
 
       const res = await api.post("/scan",
-        { repoUrl },
+        { repoUrl: result.url },
         { withCredentials: true }
       );
 
@@ -188,6 +197,68 @@ const Discovery = () => {
 
   const analytics = getAnalytics();
 
+  const normalizeGithubRepoUrl = (input) => {
+    let url = input.trim();
+
+    if (!url) {
+      alert("Please Enter Repository URL!")
+      return { valid: false, error: "Repository URL is required" };
+    }
+
+    // Remove trailing slash
+    url = url.replace(/\/+$/, "");
+
+    // Auto-append github.com if user enters owner/repo
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      if (/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(url)) {
+        url = `https://github.com/${url}`;
+      } else if (/^[a-zA-Z0-9_.-]+$/.test(url)) {
+        alert("Invalid repository URL! Please Enter in format: username/repo and Try Again!")
+        return { valid: false, error: "Repository name incomplete" };
+      } else {
+        url = `https://${url}`;
+      }
+    }
+
+    try {
+      const parsed = new URL(url);
+
+      // Only github.com
+      if (
+        parsed.hostname !== "github.com" &&
+        parsed.hostname !== "www.github.com"
+      ) {
+        alert("Only GitHub repositories are supported!")
+        return { valid: false, error: "Only GitHub repositories are supported" };
+      }
+
+      // Must be github.com/owner/repo
+      const parts = parsed.pathname.split("/").filter(Boolean);
+
+      if (parts.length < 2) {
+        alert("Invalid repository URL! Please Enter in format: https://github.com/username/repo and Try Again!")
+        return { valid: false, error: "Invalid repository URL" };
+      }
+
+      const [owner, repo] = parts;
+
+      if (
+        !/^[a-zA-Z0-9_.-]+$/.test(owner) ||
+        !/^[a-zA-Z0-9_.-]+$/.test(repo)
+      ) {
+        alert("Invalid repository URL! Please Enter in format: https://github.com/username/repo and Try Again!")
+        return { valid: false, error: "Invalid repository format" };
+      }
+
+      return {
+        valid: true,
+        url: `https://github.com/${owner}/${repo}`,
+      };
+    } catch {
+      alert("Invalid repository URL! Please Enter in format: https://github.com/username/repo and Try Again!")
+      return { valid: false, error: "Invalid URL" };
+    }
+  };
 
   return (
     <div className="flex h-screen bg-[#0B0F1A] text-slate-300 overflow-hidden custom-scrollbar">
@@ -208,6 +279,11 @@ const Discovery = () => {
               <input
                 value={repoUrl}
                 onChange={(e) => setRepoUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !loading) {
+                    handleScan();
+                  }
+                }}
                 placeholder="https://github.com/user/repo"
                 className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white"
               />
@@ -333,7 +409,7 @@ const Discovery = () => {
                 </Card>
               )}
 
-              {aiReview && (
+              {scanData.type === "findings" && aiReview && (
                 <Card className="border-l-4 border-l-purple-500">
 
                   <AiReport data={aiReview} sevr={analytics.overall} />
