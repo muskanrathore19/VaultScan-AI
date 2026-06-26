@@ -21,9 +21,8 @@ const cleanRecordSchema = new mongoose.Schema(
       default: "Clean",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-// export default mongoose.model("CleanRecord", cleanRecordSchema);
 export default mongoose.models.CleanRecord ||
   mongoose.model("CleanRecord", cleanRecordSchema);
