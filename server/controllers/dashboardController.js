@@ -2,7 +2,6 @@ import Scan from "../models/scan.js";
 import Finding from "../models/findings.js";
 import mongoose from "mongoose";
 
-
 export const getSummary = async (req, res) => {
   try {
     const scans = await Scan.find({ user: req.user.id })
@@ -54,47 +53,34 @@ export const getSummary = async (req, res) => {
       {
         title: "Critical Risk",
         count: totals.critical,
-        ...getChange(
-          lastStats.critical,
-          prevStats?.critical
-        ),
+        ...getChange(lastStats.critical, prevStats?.critical),
         color: "text-rose-500",
         glow: "shadow-rose-500/20",
       },
       {
         title: "High Risk",
         count: totals.high,
-        ...getChange(
-          lastStats.high,
-          prevStats?.high
-        ),
+        ...getChange(lastStats.high, prevStats?.high),
         color: "text-orange-500",
         glow: "shadow-orange-500/20",
       },
       {
         title: "Medium Risk",
         count: totals.medium,
-        ...getChange(
-          lastStats.medium,
-          prevStats?.medium
-        ),
+        ...getChange(lastStats.medium, prevStats?.medium),
         color: "text-amber-500",
         glow: "shadow-amber-500/20",
       },
       {
         title: "Low Risk",
         count: totals.low,
-        ...getChange(
-          lastStats.low,
-          prevStats?.low
-        ),
+        ...getChange(lastStats.low, prevStats?.low),
         color: "text-blue-500",
         glow: "shadow-blue-500/20",
       },
     ];
 
     res.json({ success: true, data });
-
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -110,11 +96,10 @@ export const getExposures = async (req, res) => {
       id: f._id,
       title: f.secretType,
       subtitle: f.repo,
-      risk: f.risk
+      risk: f.risk,
     }));
 
     res.json({ success: true, data });
-
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -135,22 +120,22 @@ export const getFindings = async (req, res) => {
                 { case: { $eq: ["$risk", "Critical"] }, then: 4 },
                 { case: { $eq: ["$risk", "High"] }, then: 3 },
                 { case: { $eq: ["$risk", "Medium"] }, then: 2 },
-                { case: { $eq: ["$risk", "Low"] }, then: 1 }
+                { case: { $eq: ["$risk", "Low"] }, then: 1 },
               ],
-              default: 0
-            }
-          }
-        }
+              default: 0,
+            },
+          },
+        },
       },
-{ $sort: { createdAt: -1 } },
+      { $sort: { createdAt: -1 } },
       {
         $group: {
           _id: "$repo",
           secretsFound: { $sum: 1 },
           lastScan: { $max: "$createdAt" },
-           scanId: { $first: "$scan" }, 
-          maxRiskLevel: { $max: "$riskLevel" }
-        }
+          scanId: { $first: "$scan" },
+          maxRiskLevel: { $max: "$riskLevel" },
+        },
       },
 
       {
@@ -161,15 +146,15 @@ export const getFindings = async (req, res) => {
                 { case: { $eq: ["$maxRiskLevel", 4] }, then: "Critical" },
                 { case: { $eq: ["$maxRiskLevel", 3] }, then: "High" },
                 { case: { $eq: ["$maxRiskLevel", 2] }, then: "Medium" },
-                { case: { $eq: ["$maxRiskLevel", 1] }, then: "Low" }
+                { case: { $eq: ["$maxRiskLevel", 1] }, then: "Low" },
               ],
-              default: "Unknown"
-            }
-          }
-        }
+              default: "Unknown",
+            },
+          },
+        },
       },
 
-      { $sort: { lastScan: -1 } }
+      { $sort: { lastScan: -1 } },
     ]);
 
     const data = grouped.map((g, i) => ({
@@ -179,17 +164,15 @@ export const getFindings = async (req, res) => {
       account: "GitHub",
       score: g.secretsFound * 20,
       sources: ["GitHub"],
-      status: g.risk
+      status: g.risk,
     }));
 
     res.json({ success: true, data });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
-
 
 export const getActivity = async (req, res) => {
   try {
@@ -203,8 +186,8 @@ export const getActivity = async (req, res) => {
       {
         $match: {
           user: userId,
-          createdAt: { $gte: startDate, $lte: today }
-        }
+          createdAt: { $gte: startDate, $lte: today },
+        },
       },
       {
         $group: {
@@ -212,16 +195,16 @@ export const getActivity = async (req, res) => {
             $dateToString: {
               format: "%Y-%m-%d",
               date: "$createdAt",
-              timezone: "Asia/Kolkata"
-            }
+              timezone: "Asia/Kolkata",
+            },
           },
-          count: { $sum: 1 }
-        }
-      }
+          count: { $sum: 1 },
+        },
+      },
     ]);
 
     const activityMap = {};
-    activity.forEach(a => {
+    activity.forEach((a) => {
       activityMap[a._id] = a.count;
     });
 
@@ -239,12 +222,11 @@ export const getActivity = async (req, res) => {
         id: i,
         date: key,
         count,
-        intensity: count>=1
+        intensity: count >= 1,
       });
     }
 
     res.json({ success: true, data: cells });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

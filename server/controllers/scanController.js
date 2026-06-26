@@ -4,6 +4,7 @@ import { scanRepoService } from "../scanner/scanner.js";
 import CleanRecord from "../models/cleanRecord.js";
 
 export const runScan = async (req, res) => {
+  let result;
   try {
     const { repoUrl } = req.body;
 
@@ -12,27 +13,31 @@ export const runScan = async (req, res) => {
     }
 
     try {
-      const result = await scanRepoService(repoUrl);
+      result = await scanRepoService(repoUrl);
     } catch (error) {
       const status = error.response?.status;
 
       if (status === 404) {
-         return res.status(404).json({error:"Repository not found. Please check the repository URL."})
-        };
-
-      if (status === 401 || status === 403) {
-        throw {
-          status: status,
-          message: "GitHub PAT token is invalid, expired, lacks permissions, or API rate limit has been reached."
-        };
+        return res
+          .status(404)
+          .json({
+            error: "Repository not found. Please check the repository URL.",
+          });
       }
 
-      throw {
-        status: 500,
-        message: error.message || "Repository scan failed."
-      };
+      if (status === 401 || status === 403) {
+        return res
+          .status(401)
+          .json({
+            error:
+              "GitHub PAT token is invalid, expired, lacks permissions, or API rate limit has been reached.",
+          });
+      } else {
+        return res
+          .status(500)
+          .json({ error: error, message: "Internal Server Error!" });
+      }
     }
-
 
     const { findings, repo, duration, aiReview } = result;
 
@@ -43,7 +48,7 @@ export const runScan = async (req, res) => {
           repo: repo,
           risk: "Clean",
           scannedAt: new Date(),
-          AI: aiReview
+          AI: aiReview,
         });
 
         console.log("Clean record saved");
@@ -53,10 +58,10 @@ export const runScan = async (req, res) => {
     }
 
     const stats = {
-      critical: findings.filter(f => f.risk === "Critical").length,
-      high: findings.filter(f => f.risk === "High").length,
-      medium: findings.filter(f => f.risk === "Medium").length,
-      low: findings.filter(f => f.risk === "Low").length,
+      critical: findings.filter((f) => f.risk === "Critical").length,
+      high: findings.filter((f) => f.risk === "High").length,
+      medium: findings.filter((f) => f.risk === "Medium").length,
+      low: findings.filter((f) => f.risk === "Low").length,
     };
 
     const scan = await Scan.create({
@@ -66,14 +71,13 @@ export const runScan = async (req, res) => {
       totalFindings: findings.length,
       duration,
       status: "completed",
-      aiReview
-
+      aiReview,
     });
 
-    const docs = findings.map(f => ({
+    const docs = findings.map((f) => ({
       ...f,
       user: req.user.id,
-      scan: scan._id
+      scan: scan._id,
     }));
 
     await Finding.insertMany(docs);
@@ -82,11 +86,9 @@ export const runScan = async (req, res) => {
       success: true,
       scanId: scan._id,
       totalFindings: findings.length,
-      AI: aiReview
+      AI: aiReview,
     });
-
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -97,13 +99,13 @@ export const getAiReview = async (req, res) => {
 
     const scan = await Scan.findOne({
       _id: scanId,
-      user: req.user.id
+      user: req.user.id,
     }).select("aiReview repos stats totalFindings createdAt");
 
     if (!scan) {
       return res.status(404).json({
         success: false,
-        message: "Scan not found"
+        message: "Scan not found",
       });
     }
 
@@ -114,15 +116,14 @@ export const getAiReview = async (req, res) => {
       totalFindings: scan.totalFindings,
       stats: scan.stats,
       aiReview: scan.aiReview,
-      createdAt: scan.createdAt
+      createdAt: scan.createdAt,
     });
-
   } catch (err) {
     console.error("Get AI Review Error:", err);
 
     return res.status(500).json({
       success: false,
-      error: err.message
+      error: err.message,
     });
   }
 };

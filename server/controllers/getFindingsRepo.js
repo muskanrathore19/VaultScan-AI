@@ -6,30 +6,29 @@ export const getRepoFindings = async (req, res) => {
 
     const findings = await Finding.find({
       user: req.user.id,
-      repo: repo
-    })
-    .sort({ createdAt: -1 }); // latest first
+      repo: repo,
+    }).sort({ createdAt: -1 }); // latest first
 
     // optional: group by scan (if multiple scans exist)
     const grouped = {};
 
-    findings.forEach(f => {
+    findings.forEach((f) => {
       const scanId = f.scan.toString();
 
       if (!grouped[scanId]) {
         grouped[scanId] = {
           scanId,
-          findings: []
+          findings: [],
         };
       }
 
       grouped[scanId].findings.push({
         file: f.file,
-        line: f.line || "N/A",   // in case line missing
+        line: f.line || "N/A", // in case line missing
         secretType: f.secretType,
         risk: f.risk,
         status: f.status,
-        createdAt: f.createdAt
+        createdAt: f.createdAt,
       });
     });
 

@@ -11,8 +11,8 @@ export const getCleanRecords = async (req, res) => {
       data: records,
     });
   } catch (error) {
-    console.error("Fetch CleanRecords Error:", error);
     res.status(500).json({
+      error: error,
       success: false,
       message: "Failed to fetch clean records",
     });

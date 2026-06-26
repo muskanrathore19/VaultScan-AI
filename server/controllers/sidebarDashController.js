@@ -12,13 +12,11 @@ export const getAnalytics = async (req, res) => {
       .sort({ createdAt: -1 })
       .select("totalFindings createdAt");
 
-    console.log(scans)
-
     const totalScans = scans.length;
 
     const totalFindings = scans.reduce(
       (sum, scan) => sum + (scan.totalFindings || 0),
-      0
+      0,
     );
 
     const latestScan = scans[0];
@@ -45,24 +43,16 @@ export const getAnalytics = async (req, res) => {
 
     if (latestScan) {
       lastScan = formatLastScan(latestScan.createdAt);
-
     }
 
-    const avgFindings =
-      totalScans > 0
-        ? totalFindings / totalScans
-        : 0;
+    const avgFindings = totalScans > 0 ? totalFindings / totalScans : 0;
 
-    const risk = Math.min(
-      Math.round((avgFindings * 5)/8),
-      100
-    );
+    const risk = Math.min(Math.round((avgFindings * 5) / 8), 100);
 
     const trend = scans
       .slice(0, 7)
       .reverse()
-      .map(scan => scan.totalFindings || 0);
-
+      .map((scan) => scan.totalFindings || 0);
 
     return res.json({
       scans: totalScans,
@@ -73,9 +63,9 @@ export const getAnalytics = async (req, res) => {
       trend,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       msg: "Server error",
+      error: err,
     });
   }
 };
