@@ -169,7 +169,6 @@ export const getFindings = async (req, res) => {
 
     res.json({ success: true, data });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -214,7 +213,7 @@ export const getActivity = async (req, res) => {
       const d = new Date(startDate);
       d.setDate(startDate.getDate() + i);
 
-      const key = d.toLocaleDateString("en-CA"); // ✅ FIXED
+      const key = d.toLocaleDateString("en-CA"); 
 
       const count = activityMap[key] || 0;
 
@@ -228,7 +227,6 @@ export const getActivity = async (req, res) => {
 
     res.json({ success: true, data: cells });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };

@@ -34,7 +34,6 @@ export const getRepoFindings = async (req, res) => {
 
     res.json(Object.values(grouped));
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch repo findings" });
+    res.status(500).json({ message: "Failed to fetch repo findings", error: err });
   }
 };
