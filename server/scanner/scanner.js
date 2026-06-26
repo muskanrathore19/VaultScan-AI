@@ -18,13 +18,11 @@ const GITHUB_API = "https://api.github.com";
 const axiosInstance = axios.create({
   headers: {
     Authorization: `token ${process.env.GITHUB_TOKEN}`,
-    "User-Agent": "config-scanner"
-  }
+    "User-Agent": "config-scanner",
+  },
 });
 
-// =========================
-// CONFIG
-// =========================
+// ========================= CONFIG =========================
 const CONCURRENCY = parseInt(process.env.CONCURRENCY) || 2;
 const MAX_FILES = 50;
 const DIFF_DEPTH = 5;
@@ -34,19 +32,17 @@ const limit = pLimit(CONCURRENCY);
 
 let SIGNATURES = [];
 
-// =========================
-// LOAD SIGNATURES
-// =========================
+// ========================= LOAD SIGNATURES =========================
 try {
   const raw = fs.readFileSync(
     new URL("./signatures.json", import.meta.url),
-    "utf-8"
+    "utf-8",
   );
 
   const parsed = JSON.parse(raw);
 
   SIGNATURES = parsed.signatures
-    .map(sig => {
+    .map((sig) => {
       try {
         const cleanedPattern = sig.pattern.replace(/\(\?i\)/g, "");
 
@@ -54,23 +50,21 @@ try {
           name: sig.name,
           regex: new RegExp(cleanedPattern, "gi"),
           risk: sig.risk || "Unknown",
-          severity: sig.severity || "medium"
+          severity: sig.severity || "medium",
         };
       } catch (err) {
-        console.log(`❌ Skipping invalid regex: ${sig.name}`);
+        console.log(`Skipping invalid regex: ${sig.name}`);
         return null;
       }
     })
     .filter(Boolean);
 
-  console.log(`✅ Loaded ${SIGNATURES.length} signatures`);
+  console.log(`Loaded ${SIGNATURES.length} signatures`);
 } catch (err) {
-  console.error("❌ Failed to load signatures:", err.message);
+  console.error("Failed to load signatures:", err.message);
 }
 
-// =========================
-// FILTERS
-// =========================
+// ========================= FILTERS =========================
 const ALLOWED_EXT = [".js", ".ts", ".json", ".env", ".py"];
 const IGNORE = ["node_modules", ".git", "dist", "build"];
 const ignoredFiles = [
@@ -84,13 +78,10 @@ const ignoredFiles = [
   "Pipfile.lock",
   "go.sum",
   "go.mod",
-  "Gemfile.lock"
+  "Gemfile.lock",
 ];
 
-
-// =========================
-// HELPERS
-// =========================
+// ========================= HELPERS =========================
 function extractRepoDetails(repoUrl) {
   const match = repoUrl.match(/github\.com\/(.+?)\/(.+?)(\.git)?$/);
 
@@ -98,28 +89,28 @@ function extractRepoDetails(repoUrl) {
 
   return {
     owner: match[1],
-    repo: match[2].replace(".git", "")
+    repo: match[2].replace(".git", ""),
   };
 }
 
 function isIgnored(filePath) {
   // return IGNORE.some(dir => filePath.includes(dir));
-   return IGNORE.some(dir => filePath.includes(dir)) ||
-    ignoredFiles.some(file => filePath.endsWith(file))
+  return (
+    IGNORE.some((dir) => filePath.includes(dir)) ||
+    ignoredFiles.some((file) => filePath.endsWith(file))
+  );
 }
 
 function shouldScan(file) {
   return (
     file.type === "blob" &&
     !isIgnored(file.path) &&
-    ALLOWED_EXT.some(ext => file.path.endsWith(ext)) &&
+    ALLOWED_EXT.some((ext) => file.path.endsWith(ext)) &&
     file.size < 100000
   );
 }
 
-// =========================
-// SHANNON ENTROPY
-// =========================
+// ========================= SHANNON ENTROPY =========================
 function calculateEntropy(str) {
   const map = {};
 
@@ -136,8 +127,7 @@ function calculateEntropy(str) {
 function detectHighEntropySecrets(line) {
   const findings = [];
 
-  const candidates =
-    line.match(/[A-Za-z0-9_\-\/+=]{20,}/g) || [];
+  const candidates = line.match(/[A-Za-z0-9_\-\/+=]{20,}/g) || [];
 
   for (const candidate of candidates) {
     // ignore obvious false positives
@@ -156,7 +146,7 @@ function detectHighEntropySecrets(line) {
         type: "High Entropy Secret",
         value: candidate,
         entropy: entropy.toFixed(2),
-        risk: entropy > 7 ? "Medium" : "Low"
+        risk: entropy > 7 ? "Medium" : "Low",
       });
     }
   }
@@ -164,14 +154,9 @@ function detectHighEntropySecrets(line) {
   return findings;
 }
 
-// =========================
-// CLONE REPO
-// =========================
+// ========================= CLONE REPO =========================
 async function cloneRepo(repoUrl) {
-  const tempDir = path.join(
-    os.tmpdir(),
-    `scan-${Date.now()}`
-  );
+  const tempDir = path.join(os.tmpdir(), `scan-${Date.now()}`);
 
   const git = simpleGit();
 
@@ -180,15 +165,13 @@ async function cloneRepo(repoUrl) {
   return tempDir;
 }
 
-// =========================
-// RECURSIVE FILE FETCH
-// =========================
+// ========================= RECURSIVE FILE FETCH =========================
 function getAllFiles(dir) {
   let results = [];
 
   const list = fs.readdirSync(dir);
 
-  list.forEach(file => {
+  list.forEach((file) => {
     const fullPath = path.join(dir, file);
 
     const stat = fs.statSync(fullPath);
@@ -205,29 +188,25 @@ function getAllFiles(dir) {
   return results;
 }
 
-// =========================
-// LOCAL FILE SCAN
-// =========================
+// ========================= LOCAL FILE SCAN =========================
 function scanLocalFiles(basePath, repoUrl) {
   const allFiles = getAllFiles(basePath);
 
-  const validFiles = allFiles.filter(file =>
-    ALLOWED_EXT.some(ext => file.endsWith(ext)) &&
-    fs.statSync(file).size < 100000
+  const validFiles = allFiles.filter(
+    (file) =>
+      ALLOWED_EXT.some((ext) => file.endsWith(ext)) &&
+      fs.statSync(file).size < 100000,
   );
 
   const findings = [];
 
-  validFiles.forEach(filePath => {
+  validFiles.forEach((filePath) => {
     const content = fs.readFileSync(filePath, "utf-8");
 
     const lines = content.split("\n");
 
     lines.forEach((line, index) => {
-
-      // =========================
-      // REGEX SCAN
-      // =========================
+      // ========================= REGEX SCAN =========================
       for (const sig of SIGNATURES) {
         const matches = line.match(sig.regex);
 
@@ -240,18 +219,15 @@ function scanLocalFiles(basePath, repoUrl) {
             repo: repoUrl,
             secretType: sig.name,
             risk: sig.risk,
-            severity: sig.severity
+            severity: sig.severity,
           });
         }
       }
 
-      // =========================
-      // ENTROPY SCAN
-      // =========================
-      const entropyFindings =
-        detectHighEntropySecrets(line);
+      // ========================= ENTROPY SCAN =========================
+      const entropyFindings = detectHighEntropySecrets(line);
 
-      entropyFindings.forEach(ent => {
+      entropyFindings.forEach((ent) => {
         findings.push({
           repo: repoUrl,
           file: filePath.replace(basePath, ""),
@@ -260,27 +236,24 @@ function scanLocalFiles(basePath, repoUrl) {
           source: "entropy",
           secretType: ent.type,
           entropy: ent.entropy,
-          risk: ent.risk
+          risk: ent.risk,
         });
       });
-
     });
   });
 
   return {
     scannedFiles: validFiles.length,
-    findings
+    findings,
   };
 }
 
-// =========================
-// LAST 5 COMMIT DIFFS
-// =========================
+// ========================= LAST 5 COMMIT DIFFS =========================
 async function getCommitDiffs(repoPath, depth = DIFF_DEPTH) {
   const git = simpleGit(repoPath);
 
   const log = await git.log({
-    maxCount: depth + 1
+    maxCount: depth + 1,
   });
 
   const commits = log.all;
@@ -296,16 +269,14 @@ async function getCommitDiffs(repoPath, depth = DIFF_DEPTH) {
     diffs.push({
       from: older,
       to: newer,
-      diff
+      diff,
     });
   }
 
   return diffs;
 }
 
-// =========================
-// SCAN DIFFS
-// =========================
+// ========================= SCAN DIFFS =========================
 function scanDiff(diffText, repoUrl, commitInfo = {}) {
   const findings = [];
 
@@ -314,9 +285,7 @@ function scanDiff(diffText, repoUrl, commitInfo = {}) {
   lines.forEach((line, index) => {
     if (!line.startsWith("+")) return;
 
-    // =========================
-    // REGEX
-    // =========================
+    // ========================= REGEX =========================
     for (const sig of SIGNATURES) {
       const match = line.match(sig.regex);
 
@@ -330,18 +299,15 @@ function scanDiff(diffText, repoUrl, commitInfo = {}) {
           repo: repoUrl,
           secretType: sig.name,
           risk: sig.risk,
-          commit: commitInfo
+          commit: commitInfo,
         });
       }
     }
 
-    // =========================
-    // ENTROPY
-    // =========================
-    const entropyFindings =
-      detectHighEntropySecrets(line);
+    // ========================= ENTROPY =========================
+    const entropyFindings = detectHighEntropySecrets(line);
 
-    entropyFindings.forEach(ent => {
+    entropyFindings.forEach((ent) => {
       findings.push({
         file: "diff",
         line: index + 1,
@@ -351,62 +317,35 @@ function scanDiff(diffText, repoUrl, commitInfo = {}) {
         secretType: ent.type,
         entropy: ent.entropy,
         risk: ent.risk,
-        commit: commitInfo
+        commit: commitInfo,
       });
     });
-
   });
 
   return findings;
 }
 
-// =========================
-// GROQ AI REVIEW
-// =========================
+// ========================= GROQ AI REVIEW =========================
 async function runGroqSecurityReview(findings) {
   try {
-
     if (!findings.length) {
       return {
         summary: "No major security findings detected.",
-        aiFindings: []
+        aiFindings: [],
       };
     }
 
-    const GROQ_API =
-      "https://api.groq.com/openai/v1/chat/completions";
+    const GROQ_API = "https://api.groq.com/openai/v1/chat/completions";
 
-    const reducedFindings = findings
-      .slice(0, 25)
-      .map(f => ({
-        file: f.file,
-        line: f.line,
-        type: f.secretType,
-        risk: f.risk,
-        value: String(f.value).slice(0, 100)
-      }));
+    const reducedFindings = findings.slice(0, 25).map((f) => ({
+      file: f.file,
+      line: f.line,
+      type: f.secretType,
+      risk: f.risk,
+      value: String(f.value).slice(0, 100),
+    }));
 
-//     const prompt = `
-// You are a Senior DevSecOps Security Auditor.
-
-// Your Output should always follow this Example Format as:
-
-
-// Analyze these findings.
-
-// Tasks:
-// 1. Detect security issues
-// 2. Explain possible vulnerabilities
-// 3. Suggest remediation
-// 4. Assign severity
-// 5. Mention OWASP/CWE mappings
-// 6. Provide executive summary
-
-// Findings:
-// ${JSON.stringify(reducedFindings, null, 2)}
-// `;
-
-const exampleReport = ` **Security Audit Report**
+    const exampleReport = ` **Security Audit Report**
 
 ### Task 1: Detect Security Issues
 
@@ -448,7 +387,7 @@ The security audit of the \`credsweeper\` project has detected high entropy secr
 
 `;
 
-const prompt = `
+    const prompt = `
 Analyze the following security findings and generate a report using the exact format demonstrated in the example.
 
 Tasks:
@@ -475,8 +414,7 @@ ${JSON.stringify(reducedFindings, null, 2)}
         messages: [
           {
             role: "system",
-            content:
-              `You are a Senior DevSecOps Security Auditor.
+            content: `You are a Senior DevSecOps Security Auditor.
               Your primary responsibility is to analyze security findings and generate professional security audit reports.
               STRICT OUTPUT RULES:
 
@@ -493,37 +431,31 @@ ${JSON.stringify(reducedFindings, null, 2)}
               - Never add introductory text.
               - Never add concluding text outside the report.
               - Return only the report.
-              - When examples are provided, mimic their structure, tone, and formatting exactly.`
+              - When examples are provided, mimic their structure, tone, and formatting exactly.`,
           },
           {
             role: "user",
-            content: prompt
-          }
+            content: prompt,
+          },
         ],
-        temperature: 0.2
+        temperature: 0.2,
       },
       {
         headers: {
-          Authorization:
-            `Bearer ${process.env.GROQ_API_KEY}`,
-          "Content-Type": "application/json"
-        }
-      }
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      },
     );
 
     return {
-      summary:
-        response.data.choices?.[0]?.message?.content
+      summary: response.data.choices?.[0]?.message?.content,
     };
-
   } catch (err) {
-    console.error(
-      "❌ Groq Review Failed:",
-      err.message
-    );
+    console.error("Groq Review Failed:", err.message);
 
     return {
-      summary: "Groq AI review failed."
+      summary: "Groq AI review failed.",
     };
   }
 }
@@ -534,33 +466,29 @@ ${JSON.stringify(reducedFindings, null, 2)}
 function deleteFolder(dirPath) {
   fs.rmSync(dirPath, {
     recursive: true,
-    force: true
+    force: true,
   });
 }
 
 // =========================
 // MAIN SCANNER
 // =========================
-export const scanRepoService = async repoUrl => {
-
-  const { owner, repo } =
-    extractRepoDetails(repoUrl);
+export const scanRepoService = async (repoUrl) => {
+  const { owner, repo } = extractRepoDetails(repoUrl);
 
   const repoRes = await axiosInstance.get(
-    `${GITHUB_API}/repos/${owner}/${repo}`
+    `${GITHUB_API}/repos/${owner}/${repo}`,
   );
 
-  const branch =
-    repoRes.data.default_branch;
+  const branch = repoRes.data.default_branch;
 
   const treeRes = await axiosInstance.get(
-    `${GITHUB_API}/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`
+    `${GITHUB_API}/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`,
   );
 
   const files = treeRes.data.tree;
 
-  const totalFiles =
-    files.filter(f => f.type === "blob").length;
+  const totalFiles = files.filter((f) => f.type === "blob").length;
 
   const useApi = totalFiles < 7;
 
@@ -571,41 +499,32 @@ export const scanRepoService = async repoUrl => {
   // API MODE
   // =========================
   if (useApi) {
-
     console.log("⚡ Using API scanning");
 
-    const validFiles =
-      files.filter(shouldScan).slice(0, MAX_FILES);
+    const validFiles = files.filter(shouldScan).slice(0, MAX_FILES);
 
     await Promise.all(
-      validFiles.map(file =>
+      validFiles.map((file) =>
         limit(async () => {
           try {
+            await new Promise((r) => setTimeout(r, 150));
 
-            await new Promise(r =>
-              setTimeout(r, 150)
+            const res = await axiosInstance.get(
+              `${GITHUB_API}/repos/${owner}/${repo}/contents/${file.path}`,
             );
-
-            const res =
-              await axiosInstance.get(
-                `${GITHUB_API}/repos/${owner}/${repo}/contents/${file.path}`
-              );
 
             if (!res.data.content) return;
 
-            const content = Buffer.from(
-              res.data.content,
-              "base64"
-            ).toString("utf-8");
+            const content = Buffer.from(res.data.content, "base64").toString(
+              "utf-8",
+            );
 
             const lines = content.split("\n");
 
             lines.forEach((line, index) => {
-
               // REGEX
               for (const sig of SIGNATURES) {
-                const matches =
-                  line.match(sig.regex);
+                const matches = line.match(sig.regex);
 
                 if (matches) {
                   findings.push({
@@ -616,16 +535,15 @@ export const scanRepoService = async repoUrl => {
                     value: matches[0],
                     risk: sig.risk,
                     severity: sig.severity,
-                    source: "api"
+                    source: "api",
                   });
                 }
               }
 
               // ENTROPY
-              const entropyFindings =
-                detectHighEntropySecrets(line);
+              const entropyFindings = detectHighEntropySecrets(line);
 
-              entropyFindings.forEach(ent => {
+              entropyFindings.forEach((ent) => {
                 findings.push({
                   repo: repoUrl,
                   file: file.path,
@@ -634,36 +552,28 @@ export const scanRepoService = async repoUrl => {
                   source: "entropy",
                   secretType: ent.type,
                   entropy: ent.entropy,
-                  risk: ent.risk
+                  risk: ent.risk,
                 });
               });
-
             });
-
           } catch (err) {
-            console.log(
-              `❌ Error scanning ${file.path}`
-            );
+            console.log(`Error scanning ${file.path}`);
           }
-        })
-      )
+        }),
+      ),
     );
 
     scannedFiles = validFiles.length;
-
   } else {
-
     // =========================
     // CLONE MODE
     // =========================
-    console.log("🐙 Using CLONE scanning");
+    console.log("Using CLONE scanning");
 
-    const repoPath =
-      await cloneRepo(repoUrl);
+    const repoPath = await cloneRepo(repoUrl);
 
     // FULL FILE SCAN
-    const result =
-      scanLocalFiles(repoPath, repoUrl);
+    const result = scanLocalFiles(repoPath, repoUrl);
 
     findings = result.findings;
 
@@ -672,23 +582,13 @@ export const scanRepoService = async repoUrl => {
     // =========================
     // LAST 5 COMMIT DIFFS
     // =========================
-    const commitDiffs =
-      await getCommitDiffs(
-        repoPath,
-        DIFF_DEPTH
-      );
+    const commitDiffs = await getCommitDiffs(repoPath, DIFF_DEPTH);
 
     for (const commitDiff of commitDiffs) {
-
-      const diffFindings =
-        scanDiff(
-          commitDiff.diff,
-          repoUrl,
-          {
-            from: commitDiff.from,
-            to: commitDiff.to
-          }
-        );
+      const diffFindings = scanDiff(commitDiff.diff, repoUrl, {
+        from: commitDiff.from,
+        to: commitDiff.to,
+      });
 
       findings.push(...diffFindings);
     }
@@ -701,9 +601,8 @@ export const scanRepoService = async repoUrl => {
   // =========================
   const unique = new Set();
 
-  findings = findings.filter(f => {
-    const key =
-      `${f.file}-${f.line}-${f.value}`;
+  findings = findings.filter((f) => {
+    const key = `${f.file}-${f.line}-${f.value}`;
 
     if (unique.has(key)) return false;
 
@@ -715,9 +614,11 @@ export const scanRepoService = async repoUrl => {
   // =========================
   // AI SECURITY REVIEW
   // =========================
-  const aiReview =
-    await runGroqSecurityReview(findings);
-    console.log(aiReview)
+  const aiReview = await runGroqSecurityReview(findings);
+  if (aiReview) {
+    console.log("AI Review generated");
+  }
+  
 
   // =========================
   // RETURN
@@ -728,6 +629,6 @@ export const scanRepoService = async repoUrl => {
     scannedFiles,
     mode: useApi ? "api" : "clone",
     totalFindings: findings.length,
-    aiReview: aiReview.summary
+    aiReview: aiReview.summary,
   };
 };
