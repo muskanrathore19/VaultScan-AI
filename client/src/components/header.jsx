@@ -1,8 +1,6 @@
-
 import { useNavigate } from "react-router-dom";
 import { Search, User, Lock } from "lucide-react";
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect } from "react";
 
 const SECURITY_TIPS = [
   "Never commit API keys to Git repositories.",
@@ -44,14 +42,13 @@ const TopHeader = ({ name }) => {
       setVisible(false);
 
       setTimeout(() => {
-        setTipIndex(prev => (prev + 1) % SECURITY_TIPS.length);
+        setTipIndex((prev) => (prev + 1) % SECURITY_TIPS.length);
         setVisible(true);
       }, 600);
     }, 4000);
 
     return () => clearInterval(interval);
   }, []);
-
 
   return (
     <header className="flex items-center justify-between py-4 px-6 border-b border-white/10 bg-[#0B0F1A]/50 backdrop-blur-xl">
@@ -68,12 +65,12 @@ const TopHeader = ({ name }) => {
               <span className="text-purple-400">💡Tip: </span>
 
               <div>
-
                 <p
-                  className={`text-sm text-purple-400 transition-all duration-300 ease-in-out ${visible
+                  className={`text-sm text-purple-400 transition-all duration-300 ease-in-out ${
+                    visible
                       ? "opacity-100 translate-y-0"
                       : "opacity-0 -translate-y-2"
-                    }`}
+                  }`}
                 >
                   {SECURITY_TIPS[tipIndex]}
                 </p>

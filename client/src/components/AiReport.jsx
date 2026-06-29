@@ -12,7 +12,9 @@ function parseBoldInline(text) {
       <strong key={i} style={{ fontWeight: 600, color: "inherit" }}>
         {part}
       </strong>
-    ) : part
+    ) : (
+      part
+    ),
   );
 }
 
@@ -28,7 +30,12 @@ function extractExecutiveSummary(md) {
   }
   const blocks = md.split(/\n{2,}/);
   const last = blocks[blocks.length - 1];
-  if (last && last.length > 80 && !last.startsWith("#") && !last.startsWith("*"))
+  if (
+    last &&
+    last.length > 80 &&
+    !last.startsWith("#") &&
+    !last.startsWith("*")
+  )
     return last.trim();
   return null;
 }
@@ -36,7 +43,7 @@ function extractExecutiveSummary(md) {
 function extractSection(md, labelRegex) {
   const p = new RegExp(
     `###\\s*(?:Task\\s*\\d+[:\\s]*)?${labelRegex}[\\s\\S]*?(?=###|$)`,
-    "i"
+    "i",
   );
   const m = md.match(p);
   return m ? m[0] : null;
@@ -76,12 +83,18 @@ function parseBodyItems(raw) {
     .replace(/###.*/g, "")
     .replace(/##.*/g, "")
     .trim();
-  const lines = cleaned.split("\n").map((l) => l.trim()).filter(Boolean);
+  const lines = cleaned
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
   const items = [];
   let proseAcc = [];
   for (const line of lines) {
     if (/^[\*\-]\s+/.test(line)) {
-      if (proseAcc.length) { items.push({ type: "prose", text: proseAcc.join(" ") }); proseAcc = []; }
+      if (proseAcc.length) {
+        items.push({ type: "prose", text: proseAcc.join(" ") });
+        proseAcc = [];
+      }
       items.push({ type: "bullet", text: line.replace(/^[\*\-]\s+/, "") });
     } else {
       proseAcc.push(line);
@@ -95,7 +108,8 @@ function parseBodyItems(raw) {
 
 const S = {
   root: {
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontFamily:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     fontSize: 14,
     lineHeight: 1.6,
     color: "#374151",
@@ -118,7 +132,11 @@ const S = {
       low: { bg: "#f0fdf4", color: "#14532d", border: "#86efac" },
       informational: { bg: "#eff6ff", color: "#1e3a8a", border: "#93c5fd" },
     };
-    const t = map[sev?.toLowerCase()] || { bg: "#f3f4f6", color: "#374151", border: "#d1d5db" };
+    const t = map[sev?.toLowerCase()] || {
+      bg: "#f3f4f6",
+      color: "#374151",
+      border: "#d1d5db",
+    };
     return {
       display: "inline-flex",
       alignItems: "center",
@@ -175,7 +193,7 @@ const S = {
     paddingBottom: 8,
     marginBottom: 10,
     borderBottom: "1px solid #f3f4f6",
-    animation: "police-flash 2s infinite steps(1)"
+    animation: "police-flash 2s infinite steps(1)",
   },
 
   prose: {
@@ -183,7 +201,7 @@ const S = {
     lineHeight: 1.8,
     color: "#d5e4e5",
     marginBottom: 6,
-    letterSpacing: 1
+    letterSpacing: 1,
   },
   bulletList: {
     listStyle: "none",
@@ -264,18 +282,25 @@ export default function AiReport({ data, sevr }) {
   }, [data, sevr]);
 
   if (!parsed) {
-    return <div style={S.empty}>No report data. Pass a markdown string via the <code>data</code> prop.</div>;
+    return (
+      <div style={S.empty}>
+        No report data. Pass a markdown string via the <code>data</code> prop.
+      </div>
+    );
   }
 
   const sections = [
     { icon: "🛡️", title: "Security Issues Detected", raw: parsed.issues },
-    { icon: "🐛", title: "Possible Vulnerabilities", raw: parsed.vulnerabilities },
+    {
+      icon: "🐛",
+      title: "Possible Vulnerabilities",
+      raw: parsed.vulnerabilities,
+    },
     { icon: "🔧", title: "Remediation Steps", raw: parsed.remediation },
   ];
 
   return (
     <div style={S.root}>
-
       {/* Severity badge */}
       {parsed.severity && (
         <div style={S.severityRow}>
@@ -307,7 +332,9 @@ export default function AiReport({ data, sevr }) {
               {title}
             </div>
             {prose.map((p, i) => (
-              <p key={i} style={S.prose}>{parseBoldInline(p.text)}</p>
+              <p key={i} style={S.prose}>
+                {parseBoldInline(p.text)}
+              </p>
             ))}
             {bullets.length > 0 && (
               <ul style={S.bulletList}>
@@ -340,7 +367,6 @@ export default function AiReport({ data, sevr }) {
           </div>
         </div>
       )}
-
     </div>
   );
 }

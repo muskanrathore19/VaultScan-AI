@@ -5,19 +5,12 @@ const RepoFindingsModal = ({ repoData, loading, onClose, repoName }) => {
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-
       <div className="bg-[#0f172a] p-6 rounded-xl w-[85%] max-h-[85%] overflow-y-auto">
-
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">
-            Findings for: {repoName}
-          </h2>
+          <h2 className="text-xl font-semibold">Findings for: {repoName}</h2>
 
-          <button
-            onClick={onClose}
-            className="text-red-400 hover:text-red-600"
-          >
+          <button onClick={onClose} className="text-red-400 hover:text-red-600">
             ✕
           </button>
         </div>
@@ -26,9 +19,8 @@ const RepoFindingsModal = ({ repoData, loading, onClose, repoName }) => {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          repoData.map(scan => (
+          repoData.map((scan) => (
             <div key={scan.scanId} className="mb-6">
-
               <h3 className="text-sm text-gray-400 mb-2">
                 Scan ID: {scan.scanId} ({scan.findings.length} issues)
               </h3>
@@ -47,34 +39,34 @@ const RepoFindingsModal = ({ repoData, loading, onClose, repoName }) => {
                 <tbody>
                   {scan.findings.map((f, i) => (
                     <tr key={i} className="border-t border-white/5">
-
                       <td className="p-2">{f.file}</td>
 
-                      <td className="p-2">
-                        {f.line || "N/A"}
-                      </td>
+                      <td className="p-2">{f.line || "N/A"}</td>
 
                       <td className="p-2">{f.secretType}</td>
 
-                      <td className={`p-2 font-medium ${f.risk === "Critical" ? "text-red-500" :
-                        f.risk === "High" ? "text-orange-400" :
-                          f.risk === "Medium" ? "text-yellow-400" :
-                            "text-green-400"
-                        }`}>
+                      <td
+                        className={`p-2 font-medium ${
+                          f.risk === "Critical"
+                            ? "text-red-500"
+                            : f.risk === "High"
+                              ? "text-orange-400"
+                              : f.risk === "Medium"
+                                ? "text-yellow-400"
+                                : "text-green-400"
+                        }`}
+                      >
                         {f.risk}
                       </td>
 
                       <td className="p-2">{f.status}</td>
-
                     </tr>
                   ))}
                 </tbody>
               </table>
-
             </div>
           ))
         )}
-
       </div>
     </div>
   );
