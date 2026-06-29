@@ -1,5 +1,10 @@
 import express from "express";
-import { getSummary, getActivity, getExposures, getFindings } from "../controllers/dashboardController.js";
+import {
+  getSummary,
+  getActivity,
+  getExposures,
+  getFindings,
+} from "../controllers/dashboardController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { getAnalytics } from "../controllers/sidebarDashController.js";
 

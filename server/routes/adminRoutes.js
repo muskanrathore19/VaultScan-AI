@@ -14,16 +14,16 @@ router.get("/dashboard", protect, adminOnly, async (req, res) => {
     const [users, scans, clean] = await Promise.all([
       User.countDocuments(),
       Scan.countDocuments(),
-      CleanRecord.countDocuments()
+      CleanRecord.countDocuments(),
     ]);
 
     const riskAgg = await Finding.aggregate([
-      { $group: { _id: "$risk", count: { $sum: 1 } } }
+      { $group: { _id: "$risk", count: { $sum: 1 } } },
     ]);
 
     const risks = { critical: 0, high: 0, medium: 0, low: 0 };
 
-    riskAgg.forEach(r => {
+    riskAgg.forEach((r) => {
       const key = r._id?.toLowerCase();
       if (risks[key] !== undefined) {
         risks[key] = r.count;
@@ -33,12 +33,12 @@ router.get("/dashboard", protect, adminOnly, async (req, res) => {
     const secretsAgg = await Finding.aggregate([
       { $group: { _id: "$secretType", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
-      { $limit: 5 }
+      { $limit: 5 },
     ]);
 
-    const topSecrets = secretsAgg.map(s => ({
+    const topSecrets = secretsAgg.map((s) => ({
       name: s._id,
-      count: s.count
+      count: s.count,
     }));
 
     res.json({
@@ -47,9 +47,8 @@ router.get("/dashboard", protect, adminOnly, async (req, res) => {
       cleanRepos: clean,
       risks,
       topSecret: topSecrets[0]?.name || null,
-      topSecrets
+      topSecrets,
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Admin dashboard failed" });
@@ -59,7 +58,7 @@ router.get("/dashboard", protect, adminOnly, async (req, res) => {
 router.get("/status", protect, adminOnly, (req, res) => {
   res.json({
     backend: true,
-    db: mongoose.connection.readyState === 1
+    db: mongoose.connection.readyState === 1,
   });
 });
 
@@ -76,6 +75,12 @@ router.delete("/user/:id", protect, adminOnly, async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (req.user._id.toString() === id) {
+      return res.status(403).json({
+        message: "You cannot delete your own account.",
+      });
+    }
+
     await User.findByIdAndDelete(id);
 
     // cascade delete (IMPORTANT)
@@ -84,7 +89,6 @@ router.delete("/user/:id", protect, adminOnly, async (req, res) => {
     await CleanRecord.deleteMany({ user: id });
 
     res.json({ message: "User and related data deleted" });
-
   } catch (err) {
     res.status(500).json({ message: "Delete failed" });
   }
