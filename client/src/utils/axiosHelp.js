@@ -1,56 +1,3 @@
-// // utils/axios.js
-// import axios from "axios";
-
-// const api = axios.create({
-//   baseURL: "http://localhost:5000/api",
-//   withCredentials: true, // for cookies
-// });
-
-// // attach token
-// api.interceptors.request.use((config) => {
-//   const token = localStorage.getItem("token");
-//   console.log(token)
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
-
-// // handle refresh automatically
-// api.interceptors.response.use(
-//   (res) => res,
-//   async (err) => {
-//     const originalRequest = err.config;
-
-//     if (err.response?.status === 401 && !originalRequest._retry) {
-//       originalRequest._retry = true;
-
-//       try {
-//         const res = await axios.post(
-//           "http://localhost:5000/api/auth/refresh",
-//           {},
-//           { withCredentials: true }
-//         );
-
-//         localStorage.setItem("token", res.data.accessToken);
-
-//         originalRequest.headers.Authorization =
-//           "Bearer " + res.data.accessToken;
-
-//         return api(originalRequest);
-//       } catch (e) {
-//         console.log(e)
-//         window.location.href = "/login";
-//       }
-//     }
-
-//     return Promise.reject(err);
-//   }
-// );
-
-// export default api;
-
-// utils/axios.js
 import axios from "axios";
 
 const api = axios.create({
@@ -70,10 +17,7 @@ api.interceptors.request.use(
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log(
-        "AUTH HEADER:",
-        `Bearer ${token.substring(0, 20)}...`
-      );
+      // console.log("AUTH HEADER:", `Bearer ${token.substring(0, 20)}...`);
     }
 
     return config;
@@ -81,7 +25,7 @@ api.interceptors.request.use(
   (error) => {
     console.log("REQUEST ERROR:", error);
     return Promise.reject(error);
-  }
+  },
 );
 
 // RESPONSE INTERCEPTOR
@@ -102,10 +46,7 @@ api.interceptors.response.use(
 
     const originalRequest = err.config;
 
-    if (
-      err.response?.status === 401 &&
-      !originalRequest._retry
-    ) {
+    if (err.response?.status === 401 && !originalRequest._retry) {
       console.log("401 DETECTED");
       console.log("ATTEMPTING TOKEN REFRESH...");
 
@@ -117,22 +58,18 @@ api.interceptors.response.use(
           {},
           {
             withCredentials: true,
-          }
+          },
         );
 
         console.log("REFRESH SUCCESS");
-        console.log(
-          "NEW TOKEN:",
-          refreshResponse.data.accessToken?.substring(0, 20) + "..."
-        );
+        // console.log(
+        //   "NEW TOKEN:",
+        //   refreshResponse.data.accessToken?.substring(0, 20) + "...",
+        // );
 
-        localStorage.setItem(
-          "token",
-          refreshResponse.data.accessToken
-        );
+        localStorage.setItem("token", refreshResponse.data.accessToken);
 
-        originalRequest.headers.Authorization =
-          `Bearer ${refreshResponse.data.accessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${refreshResponse.data.accessToken}`;
 
         console.log("RETRYING ORIGINAL REQUEST:", originalRequest.url);
 
@@ -150,7 +87,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(err);
-  }
+  },
 );
 
 export default api;
