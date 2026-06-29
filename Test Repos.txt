@@ -4,9 +4,6 @@ https://github.com/Totobi123/GenX-Lead-Intelligence-OP-v2
 
 
 
-muskanrathore@gmail.com  1234
-admin@test.com  admin123
-
-
-new11@gmail.com
-new@123
+muskanrathore@gmail.com   1234
+new11@gmail.com           new@123
+admin@vaultscan.com       adminuser26
