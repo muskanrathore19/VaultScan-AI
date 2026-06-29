@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import api from "../utils/axiosHelp";
 import { NavLink } from "react-router-dom";
 import { Card, Badge } from "../components/cards";
@@ -31,7 +31,8 @@ const Discovery = () => {
 
   const pollingRef = useRef(null);
 
-  const fetchAiReview = async (scanId) => {
+  const fetchAiReview = useCallback(async (scanId) => {
+    // NEW
     if (!scanId) return;
     try {
       setLoadingAi(true);
@@ -46,7 +47,25 @@ const Discovery = () => {
     } finally {
       setLoadingAi(false);
     }
-  };
+  }, []);
+
+  const fetchLastScan = useCallback(async () => {
+    try {
+      const res = await api.get("/last-scan", {
+        withCredentials: true,
+      });
+
+      const normalized = normalizeScanResponse(res.data);
+      setScanData(normalized);
+
+      if (normalized.id) {
+        fetchAiReview(normalized.id);
+      }
+    } catch (err) {
+      console.error("Last scan error:", err);
+      setScanData({ type: "none", data: [] });
+    }
+  }, [fetchAiReview]);
 
   // FIX: fetch user profile so `name` actually populates
   useEffect(() => {
@@ -62,8 +81,7 @@ const Discovery = () => {
     };
     fetchProfile();
     fetchLastScan();
-    fetchAiReview();
-  }, []);
+  }, [fetchLastScan]);
 
   // Cleanup polling on unmount
   useEffect(() => {
@@ -74,24 +92,6 @@ const Discovery = () => {
     if (pollingRef.current) {
       clearInterval(pollingRef.current);
       pollingRef.current = null;
-    }
-  };
-
-  const fetchLastScan = async () => {
-    try {
-      const res = await api.get("/last-scan", {
-        withCredentials: true,
-      });
-
-      const normalized = normalizeScanResponse(res.data);
-      setScanData(normalized);
-
-      if (normalized.id) {
-        fetchAiReview(normalized.id);
-      }
-    } catch (err) {
-      console.error("Last scan error:", err);
-      setScanData({ type: "none", data: [] });
     }
   };
 
@@ -114,6 +114,7 @@ const Discovery = () => {
         ) {
           stopPolling();
           setLoading(false);
+          if (normalized.id) fetchAiReview(normalized.id); // NEW
         }
       } catch (err) {
         console.error("Polling error:", err);
@@ -126,18 +127,13 @@ const Discovery = () => {
   const handleScan = async () => {
     const result = normalizeGithubRepoUrl(repoUrl);
 
-    if (!result.valid) {
-      // toast.error(result.error);
-      return;
-    }
-
-    // Update input with cleaned URL
+    if (!result.valid) return;
     setRepoUrl(result.url);
-    if (!repoUrl) return;
 
     try {
       setLoading(true);
       setScanData(null);
+      setAiReview(""); // NEW
       stopPolling(); // stop any previous poll
 
       const res = await api.post(
@@ -154,30 +150,47 @@ const Discovery = () => {
         startPolling();
       } else {
         setLoading(false);
+        if (normalized.id) fetchAiReview(normalized.id); // NEW
       }
     } catch (err) {
       const status = err.response?.status;
-      console.log(status);
+      // console.log(status)
 
+      // if (status === 404) {
+      //    alert("Repository not found. Please check the repository URL.")
+      //    return
+      //   }
+
+      // if (status === 401 || status === 403) {
+      //    alert("GitHub PAT token is invalid, expired, lacks permissions, or API rate limit has been reached.")
+      //    return
+      // }
+
+      // else {
+      //   alert(err)
+      //   return
+      // }
+
+      // NEW +++ //
       if (status === 404) {
         alert("Repository not found. Please check the repository URL.");
-        return;
-      }
-
-      if (status === 401 || status === 403) {
+      } else if (status === 401 || status === 403) {
         alert(
           "GitHub PAT token is invalid, expired, lacks permissions, or API rate limit has been reached.",
         );
-        return;
       } else {
-        alert(err);
-        return;
+        alert("An unexpected error occurred. Please try again.");
       }
-      console.error(err);
+
+      // ✅ Always clean up loading state on any error:
       setLoading(false);
       stopPolling();
-      // FIX: fall back to polling in case the POST kicked off an async job
-      startPolling();
+
+      // console.error(err);
+      // setLoading(false);
+      // stopPolling();
+      // // FIX: fall back to polling in case the POST kicked off an async job
+      // startPolling();
     }
   };
 
