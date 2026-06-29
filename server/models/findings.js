@@ -25,7 +25,7 @@ const findingSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["active", "resolved"],
+      enum: ["active", "resolved"], // To be implemented in future
       default: "active",
     },
   },
