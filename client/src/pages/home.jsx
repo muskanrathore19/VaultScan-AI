@@ -1,17 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import api from "../utils/axiosHelp"
-import { Card, Badge } from "../components/cards"
-import Sidebar from "../components/sidebar"
-import TopHeader from '../components/header';
+import api from "../utils/axiosHelp";
+import { Card, Badge } from "../components/cards";
+import Sidebar from "../components/sidebar";
+import TopHeader from "../components/header";
 import {
-  LayoutDashboard, Search, Shield, User, ChevronDown,
-  ArrowUpRight, ArrowDownRight, Plus, MoreVertical, Activity,
-  Globe, Settings, Zap, Box
-} from 'lucide-react';
+  LayoutDashboard,
+  Search,
+  Shield,
+  User,
+  ChevronDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  Plus,
+  MoreVertical,
+  Activity,
+  Globe,
+  Settings,
+  Zap,
+  Box,
+} from "lucide-react";
 
-import RepoFindingsModal from '../components/modal';
-import AiReport from '../components/AiReport';
+import RepoFindingsModal from "../components/modal";
+import AiReport from "../components/AiReport";
 
 const Home = () => {
   const [stats, setStats] = useState([]);
@@ -32,13 +43,10 @@ const Home = () => {
       setLoadingAi(true);
       setShowAiModal(true);
 
-      const res = await api.get(
-        `/scan/${scanId}/ai-review`,
-        {
-          withCredentials: true,
-        }
-      );
-      console.log(res.data.aiReview)
+      const res = await api.get(`/scan/${scanId}/ai-review`, {
+        withCredentials: true,
+      });
+      console.log(res.data.aiReview);
       setAiReview(res.data.aiReview);
     } catch (err) {
       console.error("Failed to fetch AI review:", err);
@@ -56,8 +64,7 @@ const Home = () => {
           api.get("/dashboard/findings", { withCredentials: true }),
           api.get("/dashboard/activity", { withCredentials: true }),
           api.get("/auth/me", { withCredentials: true }),
-          api.get("/clean-records", { withCredentials: true })
-
+          api.get("/clean-records", { withCredentials: true }),
         ]);
 
         setStats(s.data.data);
@@ -79,10 +86,9 @@ const Home = () => {
       setSelectedRepo(repo);
       setLoading(true);
 
-      const res = await api.get(
-        `/findings/repo/${encodeURIComponent(repo)}`, { withCredentials: true }
-
-      );
+      const res = await api.get(`/findings/repo/${encodeURIComponent(repo)}`, {
+        withCredentials: true,
+      });
 
       const data = await res.data;
       setRepoData(data);
@@ -93,18 +99,17 @@ const Home = () => {
     }
   };
   const getBarColor = (title) => {
-  if (title.includes("Critical")) return "bg-purple-500";
-  if (title.includes("High")) return "bg-orange-500";
-  if (title.includes("Medium")) return "bg-yellow-500";
-  return "bg-green-500";
-};
+    if (title.includes("Critical")) return "bg-purple-500";
+    if (title.includes("High")) return "bg-orange-500";
+    if (title.includes("Medium")) return "bg-yellow-500";
+    return "bg-green-500";
+  };
 
   return (
     <div className="flex h-screen bg-[#0B0F1A] text-slate-300 overflow-hidden custom-scrollbar">
       {showAiModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-black rounded-lg shadow-lg w-[90%] max-w-5xl max-h-[90vh] overflow-y-auto">
-
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">AI Security Review</h2>
               <button
@@ -119,15 +124,11 @@ const Home = () => {
               {loadingAi ? (
                 <div>Loading AI Review...</div>
               ) : aiReview ? (
-                <AiReport
-                  data={aiReview}
-                  sevr={""}
-                />
+                <AiReport data={aiReview} sevr={""} />
               ) : (
                 <div>No data available.</div>
               )}
             </div>
-
           </div>
         </div>
       )}
@@ -137,7 +138,6 @@ const Home = () => {
         <TopHeader name={name} />
 
         <main className="p-6 space-y-6 overflow-y-auto">
-
           {/* Stats */}
           {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((stat) => (
@@ -155,48 +155,45 @@ const Home = () => {
           </div> */}
           {/* Stats */}
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {stats.map((stat) => (
+              <Card key={stat.title}>
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-400 text-sm">{stat.title}</span>
 
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-  {stats.map((stat) => (
-    <Card key={stat.title}>
-      <div className="flex justify-between mb-2">
-        <span className="text-gray-400 text-sm">
-          {stat.title}
-        </span>
+                  <span className="text-xs flex items-center gap-1">
+                    {stat.isUp ? (
+                      <ArrowUpRight size={12} />
+                    ) : (
+                      <ArrowDownRight size={12} />
+                    )}
+                    {stat.change}
+                  </span>
+                </div>
 
-        <span className="text-xs flex items-center gap-1">
-          {stat.isUp ? (
-            <ArrowUpRight size={12} />
-          ) : (
-            <ArrowDownRight size={12} />
-          )}
-          {stat.change}
-        </span>
-      </div>
+                <h2 className={`text-3xl font-bold ${stat.color}`}>
+                  {stat.count}
+                </h2>
 
-      <h2 className={`text-3xl font-bold ${stat.color}`}>
-        {stat.count}
-      </h2>
-
-      <div
-        className={`mt-3 h-1 w-12 rounded-full shadow-lg ${getBarColor(
-          stat.title
-        )}`}
-      />
-    </Card>
-  ))}
-</div>
+                <div
+                  className={`mt-3 h-1 w-12 rounded-full shadow-lg ${getBarColor(
+                    stat.title,
+                  )}`}
+                />
+              </Card>
+            ))}
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
             <Card>
               <h3 className="text-white mb-4 flex items-center gap-2">
                 <Activity size={16} /> Threat Activity
               </h3>
               <div className="grid grid-cols-12 gap-1">
-                {activity.map(cell => (
-                  <div key={cell.id}
-                    className={`aspect-square rounded-sm ${cell.intensity > 0.7 ? 'bg-purple-400' : 'bg-white/5'}`}
+                {activity.map((cell) => (
+                  <div
+                    key={cell.id}
+                    className={`aspect-square rounded-sm ${cell.intensity > 0.7 ? "bg-purple-400" : "bg-white/5"}`}
                   />
                 ))}
               </div>
@@ -205,26 +202,16 @@ const Home = () => {
             <Card>
               <h3 className="text-white mb-4">External Exposures</h3>
               <div className="space-y-2">
-                {exposures.map(item => (
-                  <div key={item.id} className="flex justify-between p-2 bg-white/5 rounded">
+                {exposures.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex justify-between p-2 bg-white/5 rounded"
+                  >
                     <div>
                       <div className="text-sm">{item.title}</div>
-                      <div className="text-xs text-gray-400">{item.subtitle?.replace(/^https:\/\/github\.com\//, "")}</div>
-                    </div>
-                    <Badge type={item.risk}>{item.risk}</Badge>
-                  </div>
-                ))}
-              </div>
-            </Card>
-            
-            <Card >
-              <h3 className="text-white mb-4">Clean Records</h3>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                {clean.map(item => (
-                  <div key={item.id} className="flex justify-between p-2 bg-white/5 rounded">
-                    <div>
-                      <div className="text-sm">{item.repo}</div>
-                      <div className="text-xs text-gray-400">{new Date(item.createdAt).toLocaleDateString()}</div>
+                      <div className="text-xs text-gray-400">
+                        {item.subtitle?.replace(/^https:\/\/github\.com\//, "")}
+                      </div>
                     </div>
                     <Badge type={item.risk}>{item.risk}</Badge>
                   </div>
@@ -232,6 +219,25 @@ const Home = () => {
               </div>
             </Card>
 
+            <Card>
+              <h3 className="text-white mb-4">Clean Records</h3>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {clean.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex justify-between p-2 bg-white/5 rounded"
+                  >
+                    <div>
+                      <div className="text-sm">{item.repo}</div>
+                      <div className="text-xs text-gray-400">
+                        {new Date(item.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <Badge type={item.risk}>{item.risk}</Badge>
+                  </div>
+                ))}
+              </div>
+            </Card>
           </div>
 
           {/* Table */}
@@ -250,9 +256,8 @@ const Home = () => {
                 </thead>
 
                 <tbody>
-                  {findings.map(row => (
+                  {findings.map((row) => (
                     <tr key={row.id} className="border-t border-white/5">
-
                       <td className="py-2">
                         <div
                           className="flex items-center gap-2 cursor-pointer"
@@ -263,12 +268,15 @@ const Home = () => {
                         </div>
                       </td>
 
-                      <td className='py-2'> <button
-                        onClick={() => handleAiReview(row.scanId)}
-                        className="px-3 py-1 rounded bg-blue-600 text-white"
-                      >
-                        AI Report
-                      </button></td>
+                      <td className="py-2">
+                        {" "}
+                        <button
+                          onClick={() => handleAiReview(row.scanId)}
+                          className="px-3 py-1 rounded bg-blue-600 text-white"
+                        >
+                          AI Report
+                        </button>
+                      </td>
                       <td className="py-2">{row.account}</td>
                       <td className="py-2">{row.score}</td>
                       <td className="py-2">
@@ -280,7 +288,6 @@ const Home = () => {
               </table>
             </div>
           </Card>
-
         </main>
       </div>
       <RepoFindingsModal
@@ -289,7 +296,8 @@ const Home = () => {
         repoName={selectedRepo}
         onClose={() => setRepoData(null)}
       />
-    </div>)
+    </div>
+  );
 };
 
 export default Home;

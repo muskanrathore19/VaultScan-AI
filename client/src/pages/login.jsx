@@ -1,6 +1,12 @@
-import React, {useState , useEffect} from 'react';
-import { User, Mail, Lock, ShieldCheck, ArrowRight } from 'lucide-react';
-import {StyleDefinitions, BackgroundScanner, GlassCard, InputField, AnimatedGrid} from './utils.jsx';
+import React, { useState, useEffect } from "react";
+import { User, Mail, Lock, ShieldCheck, ArrowRight } from "lucide-react";
+import {
+  StyleDefinitions,
+  BackgroundScanner,
+  GlassCard,
+  InputField,
+  AnimatedGrid,
+} from "./utils.jsx";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/axiosHelp.js";
 
@@ -10,8 +16,8 @@ const LoginCore = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -34,13 +40,11 @@ const LoginCore = () => {
 
       const res = await api.post("/auth/login", {
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
 
-      // store token (important)
       localStorage.setItem("token", res.data.accessToken);
-    //   alert("Login Successful");
-      navigate("/home")
+      navigate("/home");
     } catch (err) {
       alert(err.response?.data?.message || "Invalid Credentials");
     } finally {
@@ -61,24 +65,20 @@ const LoginCore = () => {
           <span className="animate-pulse">|</span>
         </h1>
 
-        <p className="text-sm text-slate-400">
-          Secure Authentication Portal
-        </p>
+        <p className="text-sm text-slate-400">Secure Authentication Portal</p>
       </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-2">
-        <InputField 
+        <InputField
           icon={Mail}
           type="email"
           placeholder="Encrypted Email Address"
           value={formData.email}
-          onChange={(e) =>
-            setFormData({ ...formData, email: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
 
-        <InputField 
+        <InputField
           icon={Lock}
           type="password"
           placeholder="Master Password"
@@ -89,7 +89,7 @@ const LoginCore = () => {
         />
 
         {/* Button */}
-        <button 
+        <button
           type="submit"
           disabled={loading}
           className="w-full mt-4 bg-[#00f5d4] hover:bg-[#14fce0] text-[#020617] font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-[1.02] glow-effect disabled:opacity-50"
@@ -103,7 +103,10 @@ const LoginCore = () => {
       <div className="mt-8 text-center">
         <p className="text-sm text-slate-400">
           New operative?{" "}
-          <a href="/register" className="text-[#00f5d4] hover:text-white font-semibold">
+          <a
+            href="/register"
+            className="text-[#00f5d4] hover:text-white font-semibold"
+          >
             Initialize access
           </a>
         </p>
@@ -117,10 +120,10 @@ const Login = () => {
     <>
       <StyleDefinitions />
       <BackgroundScanner>
-        <LoginCore/>
+        <LoginCore />
       </BackgroundScanner>
     </>
   );
-}
+};
 
 export default Login;

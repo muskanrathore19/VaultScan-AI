@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/purity */
 
-import React, { useMemo, useState} from 'react';
-import { User, Mail, Lock, ShieldCheck, ArrowRight } from 'lucide-react';
+import React, { useMemo, useState } from "react";
+import { User, Mail, Lock, ShieldCheck, ArrowRight } from "lucide-react";
 
 const StyleDefinitions = () => (
-  <style dangerouslySetInnerHTML={{__html: `
+  <style
+    dangerouslySetInnerHTML={{
+      __html: `
     @keyframes scan {
       0% { transform: translateY(-100vh); opacity: 0; }
       10% { opacity: 1; }
@@ -39,26 +41,46 @@ const StyleDefinitions = () => (
       border: 1px solid rgba(255, 255, 255, 0.05);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(0, 245, 212, 0.1);
     }
-  `}} />
+  `,
+    }}
+  />
 );
 
 const AnimatedGrid = () => {
-  const squares = useMemo(() => Array.from({ length: 25 }).map((_, i) => ({
-    id: i,
-    left: `${Math.floor(Math.random() * 20) * 5}%`,   // snapped to grid steps
-    top: `${Math.floor(Math.random() * 20) * 5}%`,
-    size: 50,                                           // matches SVG grid cell size
-    delay: Math.random() * 3,
-    duration: Math.random() * 4 + 3,
-  })), []);
+  const squares = useMemo(
+    () =>
+      Array.from({ length: 25 }).map((_, i) => ({
+        id: i,
+        left: `${Math.floor(Math.random() * 20) * 5}%`, // snapped to grid steps
+        top: `${Math.floor(Math.random() * 20) * 5}%`,
+        size: 50, // matches SVG grid cell size
+        delay: Math.random() * 3,
+        duration: Math.random() * 4 + 3,
+      })),
+    [],
+  );
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {/* SVG Grid — unchanged */}
-      <svg width="100%" height="100%" className="absolute inset-0 opacity-[0.20]">
+      <svg
+        width="100%"
+        height="100%"
+        className="absolute inset-0 opacity-[0.20]"
+      >
         <defs>
-          <pattern id="cyber-grid" width="50" height="50" patternUnits="userSpaceOnUse">
-            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#00f5d4" strokeWidth="0.5" />
+          <pattern
+            id="cyber-grid"
+            width="50"
+            height="50"
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d="M 50 0 L 0 0 0 50"
+              fill="none"
+              stroke="#00f5d4"
+              strokeWidth="0.5"
+            />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#cyber-grid)" />
@@ -92,7 +114,7 @@ const BackgroundScanner = ({ children }) => {
     <div className="relative min-h-screen bg-[#020617] text-white overflow-hidden flex items-center justify-center p-4">
       {/* Deep Space Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#020617] via-[#081b2a] to-[#020617] z-0" />
-      
+
       <AnimatedGrid />
 
       {/* The Scanner Line Effect */}
@@ -101,9 +123,7 @@ const BackgroundScanner = ({ children }) => {
       </div>
 
       {/* Content Layer */}
-      <div className="relative z-10 w-full max-w-md">
-        {children}
-      </div>
+      <div className="relative z-10 w-full max-w-md">{children}</div>
     </div>
   );
 };
@@ -114,9 +134,9 @@ const InputField = ({ icon: Icon, type, placeholder, value, onChange }) => {
   return (
     <div className="relative group mb-5">
       <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-        <Icon 
-          size={20} 
-          className={`transition-colors duration-300 ${isFocused ? 'text-[#00f5d4]' : 'text-slate-500'}`} 
+        <Icon
+          size={20}
+          className={`transition-colors duration-300 ${isFocused ? "text-[#00f5d4]" : "text-slate-500"}`}
         />
       </div>
       <input
@@ -143,4 +163,10 @@ const GlassCard = ({ children }) => {
   );
 };
 
-export {StyleDefinitions, BackgroundScanner, GlassCard, InputField, AnimatedGrid};
+export {
+  StyleDefinitions,
+  BackgroundScanner,
+  GlassCard,
+  InputField,
+  AnimatedGrid,
+};

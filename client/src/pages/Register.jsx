@@ -1,6 +1,12 @@
-import React, {useState , useEffect} from 'react';
-import { User, Mail, Lock, ShieldCheck, ArrowRight } from 'lucide-react';
-import {StyleDefinitions, BackgroundScanner, GlassCard, InputField, AnimatedGrid} from './utils.jsx';
+import React, { useState, useEffect } from "react";
+import { User, Mail, Lock, ShieldCheck, ArrowRight } from "lucide-react";
+import {
+  StyleDefinitions,
+  BackgroundScanner,
+  GlassCard,
+  InputField,
+  AnimatedGrid,
+} from "./utils.jsx";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/axiosHelp.js";
 
@@ -8,12 +14,11 @@ const RegisterCore = () => {
   const fullText = "VaultScan";
   const [text, setText] = useState("");
   const navigate = useNavigate();
-  
 
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: ''
+    username: "",
+    email: "",
+    password: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -37,15 +42,11 @@ const RegisterCore = () => {
       const res = await api.post("/auth/register", {
         name: formData.username,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
-      // alert("Registered Successfully");
 
-      // store token (important)
       localStorage.setItem("token", res.data.accessToken);
-      navigate("/home")
-
-
+      navigate("/home");
     } catch (err) {
       alert(err.response?.data?.message || "Error");
     } finally {
@@ -73,7 +74,7 @@ const RegisterCore = () => {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-2">
-        <InputField 
+        <InputField
           icon={User}
           type="text"
           placeholder="System Username"
@@ -83,17 +84,15 @@ const RegisterCore = () => {
           }
         />
 
-        <InputField 
+        <InputField
           icon={Mail}
           type="email"
           placeholder="Encrypted Email Address"
           value={formData.email}
-          onChange={(e) =>
-            setFormData({ ...formData, email: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
 
-        <InputField 
+        <InputField
           icon={Lock}
           type="password"
           placeholder="Master Password"
@@ -104,7 +103,7 @@ const RegisterCore = () => {
         />
 
         {/* Button */}
-        <button 
+        <button
           type="submit"
           disabled={loading}
           className="w-full mt-4 bg-[#00f5d4] hover:bg-[#14fce0] text-[#020617] font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-[1.02] glow-effect disabled:opacity-50"
@@ -118,7 +117,10 @@ const RegisterCore = () => {
       <div className="mt-8 text-center">
         <p className="text-sm text-slate-400">
           Already have clearance?{" "}
-          <a href="/login" className="text-[#00f5d4] hover:text-white font-semibold">
+          <a
+            href="/login"
+            className="text-[#00f5d4] hover:text-white font-semibold"
+          >
             Authenticate here
           </a>
         </p>
@@ -126,8 +128,6 @@ const RegisterCore = () => {
     </GlassCard>
   );
 };
-
-
 
 const Register = () => {
   return (
@@ -138,6 +138,6 @@ const Register = () => {
       </BackgroundScanner>
     </>
   );
-}
+};
 
 export default Register;

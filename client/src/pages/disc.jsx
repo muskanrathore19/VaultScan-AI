@@ -1,19 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import api from "../utils/axiosHelp";
 import { NavLink } from "react-router-dom";
-import { Card, Badge } from "../components/cards"
-import Sidebar from "../components/sidebar"
+import { Card, Badge } from "../components/cards";
+import Sidebar from "../components/sidebar";
 import TopHeader from "../components/header";
-import {
-  LayoutDashboard,
-  Search,
-  Shield,
-  User,
-} from "lucide-react";
+import { LayoutDashboard, Search, Shield, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import AiReport from "../components/AiReport";
-
-
 
 const normalizeScanResponse = (data) => {
   if (data?.type === "findings") {
@@ -43,15 +36,11 @@ const Discovery = () => {
     try {
       setLoadingAi(true);
 
-      const res = await api.get(
-        `/scan/${scanId}/ai-review`,
-        {
-          withCredentials: true,
-        }
-      );
+      const res = await api.get(`/scan/${scanId}/ai-review`, {
+        withCredentials: true,
+      });
 
       setAiReview(res.data.aiReview);
-
     } catch (err) {
       console.error("AI Review Error:", err);
     } finally {
@@ -151,9 +140,10 @@ const Discovery = () => {
       setScanData(null);
       stopPolling(); // stop any previous poll
 
-      const res = await api.post("/scan",
+      const res = await api.post(
+        "/scan",
         { repoUrl: result.url },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       const normalized = normalizeScanResponse(res.data);
@@ -166,6 +156,23 @@ const Discovery = () => {
         setLoading(false);
       }
     } catch (err) {
+      const status = err.response?.status;
+      console.log(status);
+
+      if (status === 404) {
+        alert("Repository not found. Please check the repository URL.");
+        return;
+      }
+
+      if (status === 401 || status === 403) {
+        alert(
+          "GitHub PAT token is invalid, expired, lacks permissions, or API rate limit has been reached.",
+        );
+        return;
+      } else {
+        alert(err);
+        return;
+      }
       console.error(err);
       setLoading(false);
       stopPolling();
@@ -201,7 +208,7 @@ const Discovery = () => {
     let url = input.trim();
 
     if (!url) {
-      alert("Please Enter Repository URL!")
+      alert("Please Enter Repository URL!");
       return { valid: false, error: "Repository URL is required" };
     }
 
@@ -213,7 +220,9 @@ const Discovery = () => {
       if (/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(url)) {
         url = `https://github.com/${url}`;
       } else if (/^[a-zA-Z0-9_.-]+$/.test(url)) {
-        alert("Invalid repository URL! Please Enter in format: username/repo and Try Again!")
+        alert(
+          "Invalid repository URL! Please Enter in format: username/repo and Try Again!",
+        );
         return { valid: false, error: "Repository name incomplete" };
       } else {
         url = `https://${url}`;
@@ -228,25 +237,29 @@ const Discovery = () => {
         parsed.hostname !== "github.com" &&
         parsed.hostname !== "www.github.com"
       ) {
-        alert("Only GitHub repositories are supported!")
-        return { valid: false, error: "Only GitHub repositories are supported" };
+        alert("Only GitHub repositories are supported!");
+        return {
+          valid: false,
+          error: "Only GitHub repositories are supported",
+        };
       }
 
       // Must be github.com/owner/repo
       const parts = parsed.pathname.split("/").filter(Boolean);
 
       if (parts.length < 2) {
-        alert("Invalid repository URL! Please Enter in format: https://github.com/username/repo and Try Again!")
+        alert(
+          "Invalid repository URL! Please Enter in format: https://github.com/username/repo and Try Again!",
+        );
         return { valid: false, error: "Invalid repository URL" };
       }
 
       const [owner, repo] = parts;
 
-      if (
-        !/^[a-zA-Z0-9_.-]+$/.test(owner) ||
-        !/^[a-zA-Z0-9_.-]+$/.test(repo)
-      ) {
-        alert("Invalid repository URL! Please Enter in format: https://github.com/username/repo and Try Again!")
+      if (!/^[a-zA-Z0-9_.-]+$/.test(owner) || !/^[a-zA-Z0-9_.-]+$/.test(repo)) {
+        alert(
+          "Invalid repository URL! Please Enter in format: https://github.com/username/repo and Try Again!",
+        );
         return { valid: false, error: "Invalid repository format" };
       }
 
@@ -255,7 +268,9 @@ const Discovery = () => {
         url: `https://github.com/${owner}/${repo}`,
       };
     } catch {
-      alert("Invalid repository URL! Please Enter in format: https://github.com/username/repo and Try Again!")
+      alert(
+        "Invalid repository URL! Please Enter in format: https://github.com/username/repo and Try Again!",
+      );
       return { valid: false, error: "Invalid URL" };
     }
   };
@@ -268,7 +283,6 @@ const Discovery = () => {
         <TopHeader name={name} />
 
         <main className="p-6 space-y-6 overflow-y-auto">
-
           {/* SCAN CARD */}
           <Card>
             <h3 className="text-white mb-4 flex items-center gap-2">
@@ -302,7 +316,9 @@ const Discovery = () => {
                 <div className="h-1 w-full bg-white/10 rounded overflow-hidden">
                   <div className="h-full bg-gradient-to-r from-purple-500 to-blue-500 animate-[slide_1.2s_linear_infinite]"></div>
                 </div>
-                <p className="text-xs text-gray-400 mt-2">Scanning repository...</p>
+                <p className="text-xs text-gray-400 mt-2">
+                  Scanning repository...
+                </p>
               </div>
             )}
           </Card>
@@ -329,15 +345,21 @@ const Discovery = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                   <Card>
                     <div className="text-xs text-gray-400">Total Leaks</div>
-                    <div className="text-2xl font-bold text-white">{analytics.total}</div>
+                    <div className="text-2xl font-bold text-white">
+                      {analytics.total}
+                    </div>
                   </Card>
                   <Card>
                     <div className="text-xs text-gray-400">Critical</div>
-                    <div className="text-xl text-rose-400">{analytics.counts.Critical}</div>
+                    <div className="text-xl text-rose-400">
+                      {analytics.counts.Critical}
+                    </div>
                   </Card>
                   <Card>
                     <div className="text-xs text-gray-400">High</div>
-                    <div className="text-xl text-orange-400">{analytics.counts.High}</div>
+                    <div className="text-xl text-orange-400">
+                      {analytics.counts.High}
+                    </div>
                   </Card>
                   <Card>
                     <div className="text-xs text-gray-400">Medium / Low</div>
@@ -351,19 +373,24 @@ const Discovery = () => {
               {analytics && (
                 <Card>
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-sm text-gray-400">Overall Risk Level</span>
-                    <span className="text-sm font-medium text-white">{analytics.overall}</span>
+                    <span className="text-sm text-gray-400">
+                      Overall Risk Level
+                    </span>
+                    <span className="text-sm font-medium text-white">
+                      {analytics.overall}
+                    </span>
                   </div>
                   <div className="mt-3 h-2 rounded bg-white/10 overflow-hidden">
                     <div
-                      className={`h-full ${analytics.overall === "Critical"
-                        ? "bg-rose-500 w-full"
-                        : analytics.overall === "High"
-                          ? "bg-orange-500 w-3/4"
-                          : analytics.overall === "Medium"
-                            ? "bg-amber-500 w-1/2"
-                            : "bg-blue-500 w-1/4"
-                        }`}
+                      className={`h-full ${
+                        analytics.overall === "Critical"
+                          ? "bg-rose-500 w-full"
+                          : analytics.overall === "High"
+                            ? "bg-orange-500 w-3/4"
+                            : analytics.overall === "Medium"
+                              ? "bg-amber-500 w-1/2"
+                              : "bg-blue-500 w-1/4"
+                      }`}
                     />
                   </div>
                 </Card>
@@ -383,7 +410,10 @@ const Discovery = () => {
                           {item.secretType}
                         </span>
                         <span className="text-xs text-gray-400 font-mono">
-                          📁 {item.file} : <span className="text-white">Line {Number(item.line)}</span>
+                          📁 {item.file} :{" "}
+                          <span className="text-white">
+                            Line {Number(item.line)}
+                          </span>
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
@@ -411,9 +441,7 @@ const Discovery = () => {
 
               {scanData.type === "findings" && aiReview && (
                 <Card className="border-l-4 border-l-purple-500">
-
                   <AiReport data={aiReview} sevr={analytics.overall} />
-
                 </Card>
               )}
 
