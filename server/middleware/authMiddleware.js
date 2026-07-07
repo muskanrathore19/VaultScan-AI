@@ -3,6 +3,7 @@ import User from "../models/User.js";
 
 // PROTECT ROUTE
 export const protect = async (req, res, next) => {
+  
   let token;
 
   if (req.headers.authorization?.startsWith("Bearer")) {
